@@ -1,0 +1,4 @@
+# Còpies que deixa l'editor en desar (ADR 0003)
+eines/copias/
+__pycache__/
+*.tmp

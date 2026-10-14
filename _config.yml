@@ -1,0 +1,9 @@
+# GitHub Pages publica l'arrel del repositori. No es publiquen les eines, les
+# proves, la documentació ni el contingut font de les pàgines (ADR 0001).
+exclude:
+  - eines
+  - tests
+  - docs
+  - pagines
+  - README.md
+  - VERSION

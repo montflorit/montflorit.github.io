@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es"><head>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Editor del traçat de la riera (ADR 0003). S'obre amb eines/servidor.py; no es publica. --><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Editor de la riera</title>
+<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.17.0/dist/leaflet-geoman.css">
+<style>
+:root{--fondo:#fff;--texto:#1d1d1f;--suave:#5f6368;--borde:#d0d4da;--acento:#1864ab;--aviso:#c92a2a;--ok:#2b8a3e}
+@media (prefers-color-scheme:dark){:root{--fondo:#1f2124;--texto:#e8eaed;--suave:#a5abb3;--borde:#3c4043;--acento:#74b0f0;--aviso:#ff8787;--ok:#69db7c}}
+html,body{margin:0;height:100%;font:14px/1.4 system-ui,sans-serif;color:var(--texto);background:var(--fondo)}
+#map{position:absolute;inset:0}
+.panel{background:var(--fondo);color:var(--texto);padding:10px 12px;border-radius:6px;box-shadow:0 1px 5px rgba(0,0,0,.35);width:290px}
+.panel h1{font-size:15px;margin:0 0 8px}
+.panel button{font:inherit;padding:6px 12px;border-radius:5px;border:1px solid var(--borde);background:var(--fondo);color:var(--texto);cursor:pointer}
+.panel button.principal{background:var(--acento);border-color:var(--acento);color:#fff;font-weight:600}
+.panel button:disabled{opacity:.5;cursor:default}
+.fila{display:flex;align-items:center;gap:8px;margin:6px 0}
+#estado{font-size:13px;color:var(--suave)}
+#estado.pendiente{color:var(--aviso)} #estado.ok{color:var(--ok)}
+.panel label{display:block;font-size:12px;color:var(--suave);margin-top:6px}
+.panel input[type=text],.panel select{width:100%;box-sizing:border-box;font:inherit;padding:4px 6px;border:1px solid var(--borde);border-radius:4px;background:var(--fondo);color:var(--texto)}
+.panel input[type=range]{flex:1}
+details{margin-top:8px;font-size:12px;color:var(--suave)} details ul{padding-left:18px;margin:4px 0}
+#ficha{display:none;border-top:1px solid var(--borde);margin-top:8px;padding-top:4px}
+</style></head><body><div id="map"></div>
+<script src="/vendor/leaflet/leaflet.js"></script>
+<script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@2.17.0/dist/leaflet-geoman.min.js"></script>
+<script>
+const map=L.map('map',{zoomSnap:0.1,zoomDelta:0.5,wheelPxPerZoomLevel:180,wheelDebounceTime:20,maxZoom:21});
+const wmsH=(capa,anyo)=>L.tileLayer.wms('https://geoserveis.icgc.cat/servei/catalunya/orto-territorial/wms',{layers:capa,format:'image/jpeg',maxZoom:21,attribution:'Ortofoto '+anyo+': ICGC'});
+const topo=L.tileLayer('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/topografic/MON3857NW/{z}/{x}/{y}.png',{maxZoom:21,maxNativeZoom:19,attribution:'Mapa: ICGC · Cauces: © OpenStreetMap'});
+const f7077=wmsH('ortofoto_blanc_i_negre_1970-1977','1970-1977').addTo(map);
+const bases={'Ortofoto 1970-1977 (ICGC)':f7077,'Ortofoto 1956 (ICGC)':wmsH('ortofoto_blanc_i_negre_1956-1957','1956'),'Ortofoto 1946 (ICGC)':wmsH('ortofoto_blanc_i_negre_1945-1946','1946'),
+ 'Ortofoto actual (ICGC)':L.tileLayer('https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.jpeg',{maxZoom:21,maxNativeZoom:19,attribution:'Ortofoto: ICGC'}),'Topográfico actual (ICGC)':topo,'Callejero (ICGC)':L.tileLayer('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/estandard/MON3857NW/{z}/{x}/{y}.png',{maxZoom:21,maxNativeZoom:19,attribution:'Mapa: ICGC'})};
+const m1987=L.imageOverlay('/img/mapa-1987-icc.jpg',[[41.4650,2.0780],[41.4735,2.0940]],{opacity:0.5,attribution:'Mapa topogràfic 1:5.000, 1987: ICC (CC BY 4.0)'});
+L.control.layers(bases,{'Mapa 1:5.000 de 1987 (centro de Sant Cugat)':m1987},{collapsed:false,position:'topright'}).addTo(map);
+
+const colAlto='#e8590c', colRiera='#1864ab';
+function estilo(p){
+  const col=p.part==='capcalera'?colAlto:colRiera;
+  if(p.estat!=='cobert') return {color:col,weight:5,dashArray:null};
+  return {color:col,weight:5,dashArray:p.font==='reconstruccio'?'2 7':'8 6'};
+}
+const FONTS={osm:'OpenStreetMap','icc-1987':'Mapa de 1987 (ICC) y ortofotos',reconstruccio:'Reconstruido sobre las ortofotos (aproximado)'};
+let grupo=L.featureGroup().addTo(map), sinGuardar=false, historial=[], actual=null, seleccion=null;
+
+function cargar(gj,encuadrar){
+  const editando=map.pm.globalEditModeEnabled();
+  if(editando) map.pm.disableGlobalEditMode();
+  grupo.clearLayers(); seleccion=null; ocultarFicha();
+  L.geoJSON(gj,{style:f=>estilo(f.properties),onEachFeature:(f,l)=>prepara(l,f.properties)}).eachLayer(l=>grupo.addLayer(l));
+  if(encuadrar) map.fitBounds(grupo.getBounds(),{padding:[20,20]});
+  if(editando) map.pm.enableGlobalEditMode();
+}
+function prepara(l,p){
+  l.feature={type:'Feature',properties:Object.assign({},p)};
+  l.on('pm:edit',cambio); l.on('pm:vertexremoved',cambio);
+  l.on('click',()=>{ if(!map.pm.globalRemovalModeEnabled()) muestraFicha(l); });
+  l.bindTooltip(()=>'<b>'+(l.feature.properties.nom||'Torrent sense nom')+'</b>'+(l.feature.properties.estat==='cobert'?' (cubierta)':'')+'<br>'+(FONTS[l.feature.properties.font]||''),{sticky:true});
+}
+function exporta(){
+  return {type:'FeatureCollection',llicencia:LLICENCIA,features:grupo.getLayers().map(l=>{
+    const f=l.toGeoJSON(6); f.properties=Object.assign({},l.feature.properties); return f;})};
+}
+function cambio(){
+  historial.push(actual); if(historial.length>100) historial.shift();
+  actual=JSON.stringify(exporta()); marca(true);
+  document.getElementById('deshacer').disabled=false;
+}
+function deshacer(){
+  if(!historial.length) return;
+  actual=historial.pop(); cargar(JSON.parse(actual),false); marca(true);
+  document.getElementById('deshacer').disabled=!historial.length;
+}
+function marca(p){
+  sinGuardar=p; const e=document.getElementById('estado');
+  e.className=p?'pendiente':'ok'; e.textContent=p?'Cambios sin guardar':e.textContent;
+}
+async function guardar(){
+  const e=document.getElementById('estado'); e.className=''; e.textContent='Guardando…';
+  try{
+    const r=await fetch('/guardar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(exporta())});
+    const j=await r.json(); if(!j.ok) throw new Error(j.error);
+    sinGuardar=false; e.className='ok'; e.textContent='Guardado a las '+j.hora+'. El mapa de consulta ya está al día.';
+  }catch(err){ e.className='pendiente'; e.textContent='No se ha podido guardar: '+err.message+'. ¿Sigue abierto el servidor?'; }
+}
+
+/* Ficha del tramo seleccionado */
+function muestraFicha(l){
+  if(seleccion) seleccion.setStyle({weight:5});
+  seleccion=l; l.setStyle({weight:9}); const p=l.feature.properties;
+  document.getElementById('ficha').style.display='block';
+  document.getElementById('f-nombre').value=p.nom||'';
+  document.getElementById('f-tramo').value=p.part||'sant-cugat';
+  document.getElementById('f-estado').value=p.estat||'obert';
+  document.getElementById('f-fuente').value=p.font||'osm';
+}
+function ocultarFicha(){ document.getElementById('ficha').style.display='none'; if(seleccion) seleccion.setStyle({weight:5}); seleccion=null; }
+function aplicaFicha(){
+  if(!seleccion) return; const p=seleccion.feature.properties;
+  p.nom=document.getElementById('f-nombre').value.trim()||null;
+  p.part=document.getElementById('f-tramo').value;
+  p.estat=document.getElementById('f-estado').value;
+  p.font=document.getElementById('f-fuente').value;
+  seleccion.setStyle(Object.assign(estilo(p),{weight:9})); cambio();
+}
+
+/* Herramientas */
+map.pm.setLang('es');
+map.pm.addControls({position:'topleft',drawMarker:false,drawCircleMarker:false,drawPolygon:false,drawRectangle:false,drawCircle:false,drawText:false,
+  cutPolygon:false,rotateMode:false,dragMode:false,editMode:true,drawPolyline:true,removalMode:true});
+map.pm.setGlobalOptions({snappable:true,snapDistance:15,removeVertexOn:'contextmenu',pathOptions:estilo({part:'sant-cugat',estat:'cobert',font:'reconstruccio'})});
+map.on('pm:create',e=>{
+  const l=e.layer; grupo.addLayer(l);
+  prepara(l,{nom:'Riera de Sant Cugat',part:'sant-cugat',estat:'cobert',font:'reconstruccio'});
+  l.setStyle(estilo(l.feature.properties)); cambio(); muestraFicha(l);
+});
+map.on('pm:remove',e=>{ grupo.removeLayer(e.layer); if(seleccion===e.layer) ocultarFicha(); cambio(); });
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();guardar();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!/INPUT|SELECT/.test(e.target.tagName)){e.preventDefault();deshacer();}
+});
+window.addEventListener('beforeunload',e=>{ if(sinGuardar){e.preventDefault();e.returnValue='';} });
+
+const panel=L.control({position:'bottomleft'});
+panel.onAdd=()=>{const d=L.DomUtil.create('div','panel');d.innerHTML=`<h1>Editor del recorrido</h1>
+<div class="fila"><button class="principal" onclick="guardar()" title="Guarda el trazado y actualiza el mapa de consulta (Ctrl+S)">Guardar</button>
+<button id="deshacer" onclick="deshacer()" disabled title="Deshace el último cambio (Ctrl+Z)">Deshacer</button></div>
+<div id="estado">Sin cambios</div>
+<div class="fila" title="Transparencia del mapa de 1987 cuando está activado"><span>Mapa 1987</span><input type="range" min="0" max="100" value="50" oninput="m1987.setOpacity(this.value/100)"></div>
+<div id="ficha">
+ <label>Nombre (vacío si no tiene)</label><input type="text" id="f-nombre">
+ <label>Parte del recorrido</label><select id="f-tramo"><option value="capcalera">Cabecera (naranja)</option><option value="sant-cugat">Paso por Sant Cugat (azul)</option><option value="riera">Riera de Sant Cugat (azul)</option></select>
+ <label>Estado</label><select id="f-estado"><option value="obert">A cielo abierto (línea continua)</option><option value="cobert">Cubierta (línea discontinua)</option></select>
+ <label>Fuente</label><select id="f-fuente"><option value="osm">OpenStreetMap</option><option value="icc-1987">Mapa de 1987 (ICC) y ortofotos</option><option value="reconstruccio">Reconstruido sobre las ortofotos (aproximado)</option></select>
+ <div class="fila"><button onclick="aplicaFicha()">Aplicar</button><button onclick="ocultarFicha()">Cerrar</button></div>
+</div>
+<details><summary>Cómo se usa</summary><ul>
+<li><b>Mover puntos</b>: activa el lápiz de la izquierda y arrastra los puntos blancos.</li>
+<li><b>Añadir un punto</b>: con el lápiz activo, arrastra uno de los puntos pequeños que hay entre dos puntos.</li>
+<li><b>Quitar un punto</b>: con el lápiz activo, botón derecho sobre él.</li>
+<li><b>Dibujar un tramo nuevo</b>: botón de la línea; un clic por punto y clic en el último para acabar. Se engancha a los extremos cercanos.</li>
+<li><b>Borrar un tramo entero</b>: botón de la papelera y clic en el tramo.</li>
+<li><b>Nombre, estado y fuente</b>: con el lápiz desactivado, clic en el tramo.</li>
+</ul>Los fondos están arriba a la derecha. Cada vez que guardas queda una copia de la versión anterior en eines/copias. Después, para publicarlo, díselo a la IA.</details>`;
+L.DomEvent.disableClickPropagation(d); L.DomEvent.disableScrollPropagation(d); return d};
+panel.addTo(map);
+
+let LLICENCIA='';
+fetch('/dades/montflorit-limits.geojson').then(r=>r.json()).then(b=>L.geoJSON(b,{interactive:false,style:{color:'#c2255c',weight:2,dashArray:'10 5 2 5',fill:false}}).addTo(map));
+fetch('/dades/riera-sant-cugat.geojson',{cache:'no-store'}).then(r=>r.json()).then(gj=>{
+  LLICENCIA=gj.llicencia||'';
+  cargar(gj,false); actual=JSON.stringify(exporta());
+  map.setView([41.4690,2.0850],16);
+});
+</script></body></html>
