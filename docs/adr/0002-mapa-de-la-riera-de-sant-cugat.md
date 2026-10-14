@@ -101,6 +101,19 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   2,0790 E, el punto de la captura. Desde ahí hasta que se une al de Can Miró,
   3,4 km. Va en la misma capa que el Gorgs («Torrent dels Gorgs i de Can
   Domènec»), con su punto de nacimiento.
+- **Torrent sin nombre de la plaza del Pi y torrent de la Bonaigua** (Juanjo:
+  «este torrente aparece sin nombre … puedes localizar lo que es?», «investiga
+  un poco más» y «sí, aplica los dos»). Afluente del torrent de Can Miró de
+  1,3 km que nace en Bellaterra junto a la plaza del Pi y cruza la BV-1414 y la
+  vía. Sin nombre en el ICGC (red actual, buscador de topónimos y hoja 1:5.000
+  de 1995), en la ACA (código 0660130101), en OpenStreetMap, en la capa de Sant
+  Cugat (no llega a Bellaterra), en las rutas del campus de la UAB y en la
+  prensa local; no se encontró cartografía pública de Cerdanyola ni de la EMD.
+  Se dibuja como «Torrent sense nom», con una nota (`nota: placa-pi`), sin
+  inventarle nombre. La prensa vecinal (bellaterra.cat) llama torrent de la
+  Bonaigua al tramo alto del de Can Domènec (por la Font de Bonaigua, que el
+  ICGC sitúa allí): va como nombre alternativo de ese tramo, de la fuente
+  hasta la vía. La capa pasa a llamarse «Torrent dels Gorgs i afluents».
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa

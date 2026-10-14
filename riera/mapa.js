@@ -19,14 +19,14 @@ const TEXTOS = {
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
-      barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs i de Can Domènec',
+      barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs i afluents',
       xarxa: 'Xarxa hidrogràfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} anys (ACA)`,
     },
     aca: 'Capes: <a href="https://aca.gencat.cat/ca/laigua/consulta-de-dades/cartografia-geoserveis/" target="_blank" rel="noopener">Agència Catalana de l\'Aigua</a>',
     dibuixos: { amaga: 'Amaga el traçat i els límits dibuixats', mostra: 'Mostra el traçat i els límits dibuixats' },
     senseNom: 'Torrent sense nom',
-    cobert: 'coberta',
+    cobert: 'coberta', cobertM: 'cobert',
     font: {
       icgc: 'Traçat de la base topogràfica 1:5.000 de l\'ICGC.',
       osm: 'Traçat d\'OpenStreetMap: aquí la base de l\'ICGC té un buit.',
@@ -37,7 +37,8 @@ const TEXTOS = {
     naixGorgs: 'Naixement del torrent dels Gorgs: Bellaterra, al costat de la via del tren i del campus de la UAB, a tocar de Can Domènec',
     naixDomenec: 'Naixement del torrent de Can Domènec: Bellaterra, a tocar del Camí Antic de Sant Cugat',
     altres: 'Altres noms',
-    nomsFonts: { Ajuntament: 'Ajuntament de Sant Cugat', OpenStreetMap: 'OpenStreetMap', ACA: 'ACA' },
+    nomsFonts: { Ajuntament: 'Ajuntament de Sant Cugat', OpenStreetMap: 'OpenStreetMap', ACA: 'ACA', popular: 'nom popular a Bellaterra' },
+    notes: { 'placa-pi': 'Neix a Bellaterra, a tocar de la plaça del Pi, i s\'uneix al torrent de Can Miró al campus de la UAB. No té nom a cap font: ni l\'ICGC, ni l\'ACA, ni OpenStreetMap.' },
     pollancre: 'Pollancre de l\'antiga riera de Can Mora (inventari del patrimoni de la Diputació de Barcelona)',
     desembocadura: 'Desemboca al Ripoll (Montcada i Reixac)',
     mapa: 'Mapa de la riera de Sant Cugat',
@@ -68,14 +69,14 @@ const TEXTOS = {
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
-      barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs y de Can Domènec',
+      barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs y afluentes',
       xarxa: 'Red hidrográfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} años (ACA)`,
     },
     aca: 'Capas: <a href="https://aca.gencat.cat/es/laigua/consulta-de-dades/cartografia-geoserveis/" target="_blank" rel="noopener">Agència Catalana de l\'Aigua</a>',
     dibuixos: { amaga: 'Ocultar el trazado y los límites dibujados', mostra: 'Mostrar el trazado y los límites dibujados' },
     senseNom: 'Torrente sin nombre',
-    cobert: 'cubierta',
+    cobert: 'cubierta', cobertM: 'cubierto',
     font: {
       icgc: 'Trazado de la base topográfica 1:5.000 del ICGC.',
       osm: 'Trazado de OpenStreetMap: aquí la base del ICGC tiene un hueco.',
@@ -86,7 +87,8 @@ const TEXTOS = {
     naixGorgs: 'Nacimiento del torrent dels Gorgs: Bellaterra, junto a la vía del tren y al campus de la UAB, al lado de Can Domènec',
     naixDomenec: 'Nacimiento del torrent de Can Domènec: Bellaterra, junto al Camí Antic de Sant Cugat',
     altres: 'Otros nombres',
-    nomsFonts: { Ajuntament: 'Ayuntamiento de Sant Cugat', OpenStreetMap: 'OpenStreetMap', ACA: 'ACA' },
+    nomsFonts: { Ajuntament: 'Ayuntamiento de Sant Cugat', OpenStreetMap: 'OpenStreetMap', ACA: 'ACA', popular: 'nombre popular en Bellaterra' },
+    notes: { 'placa-pi': 'Nace en Bellaterra, junto a la plaza del Pi, y se une al torrent de Can Miró en el campus de la UAB. No tiene nombre en ninguna fuente: ni el ICGC, ni la ACA, ni OpenStreetMap.' },
     pollancre: 'Chopo de la antigua riera de Can Mora (inventario del patrimonio de la Diputació de Barcelona)',
     desembocadura: 'Desemboca en el Ripoll (Montcada i Reixac)',
     mapa: 'Mapa de la riera de Sant Cugat',
@@ -165,8 +167,11 @@ function textTram(p) {
   const nom = p.nom || T.senseNom;
   // Els noms que hi donen altres fonts (Juanjo, 14-10-2026), per qui els trobi en altres mapes.
   const altres = (p.altres || []).map((a) => `${a.nom} (${a.fonts.map((f) => T.nomsFonts[f] || f).join(', ')})`);
-  return `<strong>${nom}</strong>${p.estat === 'cobert' ? ` (${T.cobert})` : ''}`
+  // Concorda amb el nom: el torrent, cobert; la riera, coberta.
+  const cobert = /^torrent/i.test(nom) ? T.cobertM : T.cobert;
+  return `<strong>${nom}</strong>${p.estat === 'cobert' ? ` (${cobert})` : ''}`
     + (altres.length ? `<br>${T.altres}: ${altres.join('; ')}` : '')
+    + (p.nota && T.notes[p.nota] ? `<br>${T.notes[p.nota]}` : '')
     + `<br>${T.font[p.font] || ''}`;
 }
 
