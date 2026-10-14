@@ -151,6 +151,16 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   de esa década. De los noventa, la de 1994-1997 (50 cm); las de 1990 y 1993
   son de 2,5 m. Así el selector no crece (en el iPhone SE ya había que
   desplazarlo).
+  Después (Juanjo: «mejor poner todas las ortofotos en una regleta y que salga
+  con la actual seleccionada»): un único fondo «Ortofotos (ICGC)», destacado
+  en el selector, con la actual (capa WMS `ortofoto_color_vigent`) al final de
+  la regleta y elegida al abrirlo.
+  Cada botón muestra al pasar el ratón la fecha de vuelo de su ortofoto, y el
+  pie del mapa la de la elegida (Juanjo: «en la actual habría que poner su
+  fecha como mensaje emergente»). El ICGC la da por punto con GetFeatureInfo
+  (`data_inicial`, `data_final`; cada hoja se vuela un día; permite CORS): se
+  pide para el centro del mapa al mostrar la regleta y al moverlo. En
+  Montflorit, la actual es del 18-06-2025.
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa

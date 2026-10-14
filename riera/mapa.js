@@ -15,10 +15,14 @@ const TEXTOS = {
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-Ortoimatges/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
     tracat: '<a href="../fonts.html">Fonts</a>',
     fons: {
-      osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: '<strong>Ortofoto actual (ICGC)</strong>',
-      antiga: 'Ortofotos antigues (ICGC)',
+      osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: '<strong>Ortofotos (ICGC)</strong>',
     },
-    decades: 'Any de l\'ortofoto antiga',
+    decades: 'Any de l\'ortofoto',
+    actual: 'Actual',
+    volada: (d) => `Ortofoto volada ${d}`,
+    rang: (a, b) => `entre el ${a} i el ${b}`,
+    dia: (a) => `el ${a}`,
+    mes: (a) => `el ${a}`,
     capes: {
       barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs i afluents', afluents: 'Altres afluents de la riera',
       xarxa: 'Xarxa hidrogràfica (ACA)',
@@ -67,10 +71,14 @@ const TEXTOS = {
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios/WMS-Ortoimagenes/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
     tracat: '<a href="../fonts.html">Fuentes</a>',
     fons: {
-      osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: '<strong>Ortofoto actual (ICGC)</strong>',
-      antiga: 'Ortofotos antiguas (ICGC)',
+      osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: '<strong>Ortofotos (ICGC)</strong>',
     },
-    decades: 'Año de la ortofoto antigua',
+    decades: 'Año de la ortofoto',
+    actual: 'Actual',
+    volada: (d) => `Ortofoto tomada ${d}`,
+    rang: (a, b, mes) => (mes ? `entre ${a} y ${b}` : `entre el ${a} y el ${b}`),
+    dia: (a) => `el ${a}`,
+    mes: (a) => `en ${a}`,
     capes: {
       barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs y afluentes', afluents: 'Otros afluentes de la riera',
       xarxa: 'Red hidrográfica (ACA)',
@@ -137,8 +145,8 @@ mapa.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blan
 const tesseles = (url, atribucio) => L.tileLayer(url, {
   maxZoom: 21, maxNativeZoom: 19, attribution: atribucio + ' · ' + T.tracat,
 });
-// Les ortofotos antigues, una per dècada (Juanjo, 14-10-2026): un sol fons i, a sota,
-// una regleta per passar d'una a l'altra. L'ICGC no en té cap dels anys seixanta;
+// Les ortofotos, l'actual i una per dècada (Juanjo, 14-10-2026): un sol fons i, a sota,
+// una regleta per passar d'una a l'altra, amb l'actual triada en obrir-lo. L'ICGC no en té cap dels anys seixanta;
 // dels noranta, la de 1994-1997, que té més detall que les de 1990 i 1993.
 const DECADES = [
   ['ortofoto_blanc_i_negre_1945-1946', '1946'],
@@ -148,18 +156,19 @@ const DECADES = [
   ['ortofoto_blanc_i_negre_1994-1997', '1994-97'],
   ['ortofoto_color_2000-2003', '2000-03'],
   ['ortofoto_color_2010', '2010'],
+  ['ortofoto_color_vigent', T.actual],
 ];
+const ACTUAL = DECADES.length - 1;
 const atribucioAntiga = (any) => T.ortoAny(any) + ' · ' + T.tracat;
 const ortoAntiga = L.tileLayer.wms('https://geoserveis.icgc.cat/servei/catalunya/orto-territorial/wms', {
-  layers: DECADES[0][0], format: 'image/jpeg', maxZoom: 21, attribution: atribucioAntiga(DECADES[0][1]),
+  layers: DECADES[ACTUAL][0], format: 'image/jpeg', maxZoom: 21, attribution: atribucioAntiga(DECADES[ACTUAL][1]),
 });
 const fonsOsm = tesseles('https://tile.openstreetmap.org/{z}/{x}/{y}.png', T.osm).addTo(mapa);
 const fons = {
   [T.fons.osm]: fonsOsm,
   [T.fons.carrers]: tesseles('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/estandard/MON3857NW/{z}/{x}/{y}.png', T.icgc),
   [T.fons.topo]: tesseles('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/topografic/MON3857NW/{z}/{x}/{y}.png', T.icgc),
-  [T.fons.orto]: tesseles('https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.jpeg', T.icgc),
-  [T.fons.antiga]: ortoAntiga,
+  [T.fons.orto]: ortoAntiga,
 };
 
 // Les capes de l'Agència Catalana de l'Aigua, del seu servei oficial de visualització.
@@ -329,13 +338,64 @@ const ControlCompleta = L.Control.extend({
 });
 new ControlCompleta().addTo(mapa);
 
-// --- La regleta de les dècades, només quan el fons és l'ortofoto antiga ---
+// --- La regleta de les ortofotos, només quan el fons és l'ortofoto ---
 let regleta;
-function triaDecada(n) {
-  const [capa, any] = DECADES[n];
+let decadaTriada = ACTUAL;
+const dates = [];   // la data de vol de cada ortofoto al centre del mapa, o null
+
+// La data de vol: l'ICGC la dona per a cada punt (cada full es vola un dia). Es
+// demana per al centre del mapa en mostrar la regleta i en moure'l, i surt en
+// passar el ratolí per cada botó i al peu del mapa, la de l'ortofoto triada.
+// Quan l'ICGC només sap el mes, hi posa el dia 1: llavors es diu només el mes.
+function formataData(text, nomesMes) {
+  const [a, m, d] = text.slice(0, 10).split('/').map(Number);
+  const opcions = nomesMes ? { month: 'long', year: 'numeric' } : { day: 'numeric', month: 'long', year: 'numeric' };
+  return new Date(a, m - 1, d).toLocaleDateString(LLENGUA === 'es' ? 'es-ES' : 'ca-ES', opcions);
+}
+function textData(props) {
+  if (!props || !props.data_inicial) return null;
+  const fiText = props.data_final || props.data_inicial;
+  const nomesMes = props.data_inicial.slice(8, 10) === '01' && fiText.slice(8, 10) === '01';
+  const ini = formataData(props.data_inicial, nomesMes), fi = formataData(fiText, nomesMes);
+  if (ini !== fi) return T.volada(T.rang(ini, fi, nomesMes));
+  return T.volada(nomesMes ? T.mes(ini) : T.dia(ini));
+}
+function posaAtribucio() {
   mapa.attributionControl.removeAttribution(ortoAntiga.options.attribution);
-  ortoAntiga.options.attribution = atribucioAntiga(any);
-  mapa.attributionControl.addAttribution(ortoAntiga.options.attribution);
+  const [, any] = DECADES[decadaTriada];
+  ortoAntiga.options.attribution = (dates[decadaTriada] ? dates[decadaTriada] + ': ICGC · ' + T.tracat : atribucioAntiga(any))
+    .replace(': ICGC', ': <a href="' + (LLENGUA === 'es'
+      ? 'https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios/WMS-Ortoimagenes/WMS-Ortofoto-Territorial'
+      : 'https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-Ortoimatges/WMS-Ortofoto-Territorial')
+      + '" target="_blank" rel="noopener">ICGC</a>');
+  if (mapa.hasLayer(ortoAntiga)) mapa.attributionControl.addAttribution(ortoAntiga.options.attribution);
+}
+let peticioDates = 0;
+function demanaDates() {
+  if (!regleta || regleta.hidden) return;
+  const c = mapa.getCenter(), d = 0.0005;
+  const bbox = [c.lng - d, c.lat - d, c.lng + d, c.lat + d].join(',');
+  const aquesta = ++peticioDates;
+  DECADES.forEach(([capa], n) => {
+    const url = 'https://geoserveis.icgc.cat/servei/catalunya/orto-territorial/wms?SERVICE=WMS&VERSION=1.3.0'
+      + '&REQUEST=GetFeatureInfo&LAYERS=' + capa + '&QUERY_LAYERS=' + capa + '&STYLES=&CRS=CRS:84&BBOX=' + bbox
+      + '&WIDTH=3&HEIGHT=3&I=1&J=1&INFO_FORMAT=application/json';
+    fetch(url).then((r) => r.json()).then((j) => {
+      if (aquesta !== peticioDates) return;
+      dates[n] = textData(j.features && j.features[0] && j.features[0].properties);
+      const boto = regleta.querySelectorAll('button')[n];
+      if (dates[n]) boto.title = dates[n]; else boto.removeAttribute('title');
+      if (n === decadaTriada) posaAtribucio();
+    }).catch(() => {});
+  });
+}
+let esperaDates;
+mapa.on('moveend', () => { clearTimeout(esperaDates); esperaDates = setTimeout(demanaDates, 500); });
+
+function triaDecada(n) {
+  const [capa] = DECADES[n];
+  decadaTriada = n;
+  posaAtribucio();
   ortoAntiga.setParams({ layers: capa });
   regleta.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-pressed', i === n ? 'true' : 'false'));
 }
@@ -350,7 +410,7 @@ const ControlDecades = L.Control.extend({
       const b = L.DomUtil.create('button', '', regleta);
       b.type = 'button';
       b.textContent = any;
-      b.setAttribute('aria-pressed', n === 0 ? 'true' : 'false');
+      b.setAttribute('aria-pressed', n === ACTUAL ? 'true' : 'false');
       L.DomEvent.on(b, 'click', () => triaDecada(n));
     });
     L.DomEvent.disableClickPropagation(regleta);
@@ -359,7 +419,7 @@ const ControlDecades = L.Control.extend({
   },
 });
 new ControlDecades().addTo(mapa);
-mapa.on('baselayerchange', (e) => { regleta.hidden = e.layer !== ortoAntiga; });
+mapa.on('baselayerchange', (e) => { regleta.hidden = e.layer !== ortoAntiga; demanaDates(); });
 
 // Mentre hi ha una finestreta oberta, els botons del mapa s'aparten perquè no la tapin
 // (al mòbil no hi ha lloc per a tots dos). Tornen en tancar-la.
