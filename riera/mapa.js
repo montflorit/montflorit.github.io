@@ -19,7 +19,7 @@ const TEXTOS = {
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
-      barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs',
+      barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs i de Can Domènec',
       xarxa: 'Xarxa hidrogràfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} anys (ACA)`,
     },
@@ -35,6 +35,7 @@ const TEXTOS = {
     barri: 'Límits del barri de Montflorit',
     rabassalet: 'Font del Rabassalet: aquí neix la riera segons la Gran Enciclopèdia Catalana. Seca, segons la fitxa de la Diputació revisada el 2025.',
     naixGorgs: 'Naixement del torrent dels Gorgs: Bellaterra, al costat de la via del tren i del campus de la UAB, a tocar de Can Domènec',
+    naixDomenec: 'Naixement del torrent de Can Domènec: Bellaterra, a tocar del Camí Antic de Sant Cugat',
     altres: 'Altres noms',
     nomsFonts: { Ajuntament: 'Ajuntament de Sant Cugat', OpenStreetMap: 'OpenStreetMap', ACA: 'ACA' },
     pollancre: 'Pollancre de l\'antiga riera de Can Mora (inventari del patrimoni de la Diputació de Barcelona)',
@@ -67,7 +68,7 @@ const TEXTOS = {
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
-      barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs',
+      barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs y de Can Domènec',
       xarxa: 'Red hidrográfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} años (ACA)`,
     },
@@ -83,6 +84,7 @@ const TEXTOS = {
     barri: 'Límites del barrio de Montflorit',
     rabassalet: 'Font del Rabassalet: aquí nace la riera según la Gran Enciclopèdia Catalana. Seca, según la ficha de la Diputació revisada en 2025.',
     naixGorgs: 'Nacimiento del torrent dels Gorgs: Bellaterra, junto a la vía del tren y al campus de la UAB, al lado de Can Domènec',
+    naixDomenec: 'Nacimiento del torrent de Can Domènec: Bellaterra, junto al Camí Antic de Sant Cugat',
     altres: 'Otros nombres',
     nomsFonts: { Ajuntament: 'Ayuntamiento de Sant Cugat', OpenStreetMap: 'OpenStreetMap', ACA: 'ACA' },
     pollancre: 'Chopo de la antigua riera de Can Mora (inventario del patrimonio de la Diputació de Barcelona)',
@@ -461,11 +463,14 @@ Promise.all([
   const fi = darrer[darrer.length - 1];
   // La font, al lloc de la fitxa de la Diputació; el traçat comença una mica més avall.
   punt(41.430139, 2.106803, T.rabassalet, { variableColor: '--capcalera', fillColor: color('--capcalera') });
-  const gorgs = trams.filter((f) => f.properties.part === 'afluent');
-  if (gorgs.length) {
-    const naix = gorgs[0].geometry.coordinates[0];
-    punt(naix[1], naix[0], T.naixGorgs, { radius: 6, variableColor: '--afluent', fillColor: color('--afluent') });
-  }
+  // El naixement de cada afluent: el primer punt del seu primer tram.
+  const naixements = { 'Torrent de Can Miró': T.naixGorgs, 'Torrent de Can Domènec': T.naixDomenec };
+  Object.entries(naixements).forEach(([nom, text]) => {
+    const primer = trams.find((f) => f.properties.part === 'afluent' && f.properties.nom === nom);
+    if (!primer) return;
+    const naix = primer.geometry.coordinates[0];
+    punt(naix[1], naix[0], text, { radius: 6, variableColor: '--afluent', fillColor: color('--afluent') });
+  });
   punt(41.469438, 2.083075, T.pollancre, { radius: 5, variableColor: '--riera', fillColor: color('--riera') });
   punt(fi[1], fi[0], T.desembocadura, { variableColor: '--riera', fillColor: color('--riera') });
   puntsDeReferencia.addTo(mapa);

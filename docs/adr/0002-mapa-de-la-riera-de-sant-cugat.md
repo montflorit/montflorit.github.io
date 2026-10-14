@@ -93,6 +93,14 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   el mapa que nacía antes. En su propia capa (`part: afluent`), con su
   color, en la leyenda y en el selector; el botón del ojo también lo oculta, y
   la distancia del menú de un punto sigue midiéndose solo a la riera.
+- **Torrent de Can Domènec** (Juanjo: «marca también el torrent de can
+  domenec que nace aquí según icgc», con una captura junto al Camí Antic de
+  Sant Cugat). En la red del ICGC el nombre solo va en el tramo bajo, desde
+  41,4978 N; 2,0931 E; aguas arriba sigue una cadena sin nombre, con pasos
+  cubiertos bajo las calles de Bellaterra y bajo la vía, hasta 41,5053 N;
+  2,0790 E, el punto de la captura. Desde ahí hasta que se une al de Can Miró,
+  3,4 km. Va en la misma capa que el Gorgs («Torrent dels Gorgs i de Can
+  Domènec»), con su punto de nacimiento.
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa

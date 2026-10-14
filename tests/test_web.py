@@ -120,15 +120,15 @@ def test_tracat_continu():
         assert metres ** 0.5 < 1, f"salt entre {anterior['properties']} i {seguent['properties']}"
 
 
-def test_afluent_continu_fins_a_la_riera():
-    """El torrent dels Gorgs va seguit i acaba a sobre de la riera (menys d'1 m)."""
+def test_afluents_connectats_a_la_riera():
+    """Cada tram dels afluents acaba a sobre d'un altre tram d'afluent o de la riera (menys d'1 m)."""
     totes = json.loads(llegeix("dades/riera-sant-cugat.geojson"))["features"]
     afl = [f["geometry"]["coordinates"] for f in totes if f["properties"]["part"] == "afluent"]
     riera = [p for f in totes if f["properties"]["part"] == "riera" for p in f["geometry"]["coordinates"]]
     metres = lambda a, b: (((a[0] - b[0]) * 83500) ** 2 + ((a[1] - b[1]) * 111000) ** 2) ** 0.5
-    for anterior, seguent in zip(afl, afl[1:]):
-        assert metres(anterior[-1], seguent[0]) < 1
-    assert min(metres(afl[-1][-1], p) for p in riera) < 1
+    for n, tram in enumerate(afl):
+        altres = riera + [p for m, t in enumerate(afl) if m != n for p in t]
+        assert min(metres(tram[-1], p) for p in altres) < 1, f"tram {n} de l'afluent sense continuació"
 
 
 def test_limits_iguals_que_temps_a_montflorit():
