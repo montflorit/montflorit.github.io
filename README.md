@@ -21,7 +21,9 @@ nada de otras webs (ADR 0001).
 No guarda nada de quien la visita, salvo el tema claro u oscuro si se elige,
 en el propio dispositivo. Sin cookies, estadísticas ni contadores. El mapa
 pide los fondos a OpenStreetMap y al Institut Cartogràfic i Geològic de
-Catalunya (ICGC); todo lo demás, también Leaflet, se sirve desde esta web.
+Catalunya (ICGC), y las capas de la Agència Catalana de l'Aigua (ACA) al
+servidor de mapas de la Generalitat si se activan; todo lo demás, también
+Leaflet, se sirve desde esta web.
 
 ## Organización
 

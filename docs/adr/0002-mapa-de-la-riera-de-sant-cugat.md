@@ -72,6 +72,22 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   la tecla de menú o Mayús+F10 lo abren en el centro del mapa. Un enlace
   `riera/#punt=lat,lon` abre el mapa centrado en el punto, marcado. Son enlaces
   que sigue quien quiere: el mapa no pide nada a esos servicios.
+- **Capas de la ACA** (Juanjo: «¿se puede añadir la capa del ACA?»): del
+  servicio de visualización oficial que la ACA anuncia en «Cartografia i
+  geoserveis» (`sig.gencat.cat/ows/AIGUA/wms`; sin restricciones de acceso ni
+  tasas según el propio servicio). La red hidrográfica
+  (`AIGUA_XARXA_RIUS_ARC`) y las zonas inundables de la cuenca del Besòs para
+  avenidas de 10, 100 y 500 años con la profundidad del agua
+  (`AIGUA_CALAT_BESOS_Y10`, `_Y100`, `_Y500`), como capas que se activan en el
+  selector. Su leyenda (los cinco tramos de profundidad que da la propia ACA
+  con GetLegendGraphic) sale bajo el mapa solo cuando hay una activa. Se
+  descartó `aplicacions.aca.gencat.cat/geoserver`, que también responde, porque
+  no es el servicio que la ACA publica para terceros.
+- **Botón del ojo** (Juanjo: «quiero un botón o similar para mostrar/ocultar
+  las líneas dibujadas sobre el mapa»): oculta el trazado, los límites del
+  barrio y los puntos, para ver limpio el mapa de debajo; al volver a
+  mostrarlos solo salen los que estaban (los límites pueden haberse quitado en
+  el selector).
 - **Leyenda debajo del mapa**, en HTML: en el móvil no tapa el mapa y se lee
   sin depender del color (cada estado tiene su trazo).
 - **Leaflet servido desde la propia web**, no desde un CDN.

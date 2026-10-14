@@ -18,7 +18,13 @@ const TEXTOS = {
       osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: 'Ortofoto actual (ICGC)',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
-    capes: { m1987: 'Mapa de 1987, centre de Sant Cugat (ICC)', barri: 'Límits de Montflorit' },
+    capes: {
+      m1987: 'Mapa de 1987, centre de Sant Cugat (ICC)', barri: 'Límits de Montflorit',
+      xarxa: 'Xarxa hidrogràfica (ACA)',
+      inundable: (anys) => `Zona inundable cada ${anys} anys (ACA)`,
+    },
+    aca: 'Capes: <a href="https://aca.gencat.cat/ca/laigua/consulta-de-dades/cartografia-geoserveis/" target="_blank" rel="noopener">Agència Catalana de l\'Aigua</a>',
+    dibuixos: { amaga: 'Amaga el traçat i els límits dibuixats', mostra: 'Mostra el traçat i els límits dibuixats' },
     senseNom: 'Torrent sense nom',
     cobert: 'coberta',
     font: {
@@ -56,7 +62,13 @@ const TEXTOS = {
       osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: 'Ortofoto actual (ICGC)',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
-    capes: { m1987: 'Mapa de 1987, centro de Sant Cugat (ICC)', barri: 'Límites de Montflorit' },
+    capes: {
+      m1987: 'Mapa de 1987, centro de Sant Cugat (ICC)', barri: 'Límites de Montflorit',
+      xarxa: 'Red hidrográfica (ACA)',
+      inundable: (anys) => `Zona inundable cada ${anys} años (ACA)`,
+    },
+    aca: 'Capas: <a href="https://aca.gencat.cat/es/laigua/consulta-de-dades/cartografia-geoserveis/" target="_blank" rel="noopener">Agència Catalana de l\'Aigua</a>',
+    dibuixos: { amaga: 'Ocultar el trazado y los límites dibujados', mostra: 'Mostrar el trazado y los límites dibujados' },
     senseNom: 'Torrente sin nombre',
     cobert: 'cubierta',
     font: {
@@ -131,6 +143,15 @@ const mapa1987 = L.imageOverlay(ARREL + 'img/mapa-1987-icc.jpg', [[41.4650, 2.07
   attribution: 'Mapa de 1987: <a href="https://cartotecadigital.icgc.cat/digital/collection/topo5000/id/5766" target="_blank" rel="noopener">ICC</a> (CC BY 4.0)',
 });
 
+// Les capes de l'Agència Catalana de l'Aigua, del seu servei oficial de visualització.
+// Les zones inundables són les de la conca del Besòs, amb la profunditat de l'aigua
+// en una avinguda que, de mitjana, arriba una vegada cada 10, 100 o 500 anys.
+const capaAca = (capa) => L.tileLayer.wms('https://sig.gencat.cat/ows/AIGUA/wms', {
+  layers: capa, format: 'image/png', transparent: true, maxZoom: 21, attribution: T.aca,
+});
+const xarxaAca = capaAca('AIGUA_XARXA_RIUS_ARC');
+const inundables = { 10: capaAca('AIGUA_CALAT_BESOS_Y10'), 100: capaAca('AIGUA_CALAT_BESOS_Y100'), 500: capaAca('AIGUA_CALAT_BESOS_Y500') };
+
 // --- Estil de cada tram ---
 function estilTram(p) {
   const c = color(p.part === 'capcalera' ? '--capcalera' : '--riera');
@@ -160,7 +181,22 @@ function punt(lat, lon, text, opcions) {
     .addTo(puntsDeReferencia);
 }
 
-L.control.layers(fons, { [T.capes.barri]: capaBarri, [T.capes.m1987]: mapa1987 }, { position: 'topright' }).addTo(mapa);
+L.control.layers(fons, {
+  [T.capes.barri]: capaBarri,
+  [T.capes.m1987]: mapa1987,
+  [T.capes.xarxa]: xarxaAca,
+  [T.capes.inundable(10)]: inundables[10],
+  [T.capes.inundable(100)]: inundables[100],
+  [T.capes.inundable(500)]: inundables[500],
+}, { position: 'topright' }).addTo(mapa);
+
+// La llegenda de la profunditat, només quan hi ha alguna zona inundable a la vista.
+function llegendaInundable() {
+  const visible = Object.values(inundables).some((capa) => mapa.hasLayer(capa));
+  const llegenda = document.getElementById('llegenda-inundable');
+  if (llegenda) llegenda.hidden = !visible;
+}
+mapa.on('overlayadd overlayremove', llegendaInundable);
 L.control.scale({ imperial: false }).addTo(mapa);
 
 // --- Pantalla completa ---
@@ -215,6 +251,57 @@ const ControlCompleta = L.Control.extend({
   },
 });
 new ControlCompleta().addTo(mapa);
+
+// --- Mostrar o amagar el que hi ha dibuixat (Juanjo, 14-10-2026) ---
+// El traçat, els límits del barri i els punts, per veure el mapa de sota net.
+// En tornar-los a mostrar, només surten els que hi havia (els límits es poden haver tret al selector).
+const ICONES_ULL = {
+  obert: '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+  tancat: '<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143M2 2l20 20"/>',
+};
+let dibuixosAmagats = null;   // els que s'han tret, mentre estan amagats
+let botoDibuixos;
+let marcaCompartida = null;
+
+function dibuixos() {
+  return [capaRiera, capaBarri, puntsDeReferencia, marcaCompartida].filter(Boolean);
+}
+
+function actualitzaBotoDibuixos() {
+  const amagats = dibuixosAmagats !== null;
+  const text = amagats ? T.dibuixos.mostra : T.dibuixos.amaga;
+  botoDibuixos.title = text;
+  botoDibuixos.setAttribute('aria-label', text);
+  botoDibuixos.setAttribute('aria-pressed', amagats ? 'true' : 'false');
+  botoDibuixos.querySelector('svg').innerHTML = amagats ? ICONES_ULL.tancat : ICONES_ULL.obert;
+}
+
+function canviaDibuixos() {
+  if (dibuixosAmagats === null) {
+    dibuixosAmagats = dibuixos().filter((capa) => mapa.hasLayer(capa));
+    dibuixosAmagats.forEach((capa) => mapa.removeLayer(capa));
+    mapa.closePopup();
+  } else {
+    dibuixosAmagats.forEach((capa) => capa.addTo(mapa));
+    dibuixosAmagats = null;
+  }
+  actualitzaBotoDibuixos();
+}
+
+const ControlDibuixos = L.Control.extend({
+  options: { position: 'topleft' },
+  onAdd() {
+    const caixa = L.DomUtil.create('div', 'leaflet-bar');
+    botoDibuixos = L.DomUtil.create('button', 'boto-completa boto-dibuixos', caixa);
+    botoDibuixos.type = 'button';
+    botoDibuixos.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"></svg>';
+    L.DomEvent.disableClickPropagation(caixa);
+    L.DomEvent.on(botoDibuixos, 'click', canviaDibuixos);
+    return caixa;
+  },
+});
+new ControlDibuixos().addTo(mapa);
+actualitzaBotoDibuixos();
 actualitzaBoto();
 document.addEventListener('fullscreenchange', actualitzaBoto);
 document.addEventListener('keydown', (e) => {
@@ -353,7 +440,7 @@ Promise.all([
   capaRiera.addData(riera).addTo(mapa);
   tracatRiera = capaRiera.getLayers();
   if (compartit) {
-    L.marker(compartit, { title: T.menu.punt, alt: T.menu.punt }).addTo(mapa)
+    marcaCompartida = L.marker(compartit, { title: T.menu.punt, alt: T.menu.punt }).addTo(mapa)
       .bindTooltip(`${T.menu.punt}: ${coordenades(compartit)}`, { permanent: true, direction: 'top', offset: [0, -30] });
   }
   const trams = riera.features;

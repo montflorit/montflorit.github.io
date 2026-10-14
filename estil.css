@@ -225,3 +225,11 @@ body.sense-desplacament { overflow: hidden; }
   cursor: pointer;
 }
 .menu-punt button:hover, .menu-punt a:hover { background: #f1f4f8; }
+
+/* La llegenda de la profunditat de les zones inundables (els colors de l'ACA). */
+.prof { display: inline-block; width: .9rem; height: .9rem; margin: 0 .2rem 0 .5rem; vertical-align: -.1rem; border: 1px solid rgba(0,0,0,.25); }
+.prof.p1 { background: #f5f582; }
+.prof.p2 { background: #f5b000; }
+.prof.p3 { background: #e31005; }
+.prof.p4 { background: #8c124f; }
+.prof.p5 { background: #f542e3; }
