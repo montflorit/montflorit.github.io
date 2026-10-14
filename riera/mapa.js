@@ -15,7 +15,7 @@ const TEXTOS = {
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-Ortoimatges/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
     tracat: 'Traçat: ICGC, Ajuntament de Sant Cugat i OpenStreetMap (<a href="../fonts.html">fonts</a>)',
     fons: {
-      osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: 'Ortofoto actual (ICGC)',
+      osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: '<strong>Ortofoto actual (ICGC)</strong>',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
@@ -60,7 +60,7 @@ const TEXTOS = {
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios/WMS-Ortoimagenes/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
     tracat: 'Trazado: ICGC, Ayuntamiento de Sant Cugat y OpenStreetMap (<a href="../fonts.html">fuentes</a>)',
     fons: {
-      osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: 'Ortofoto actual (ICGC)',
+      osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: '<strong>Ortofoto actual (ICGC)</strong>',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
