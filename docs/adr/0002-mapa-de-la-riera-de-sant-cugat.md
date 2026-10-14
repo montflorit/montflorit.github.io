@@ -84,10 +84,13 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   desde la fuente.
 - **Torrent dels Gorgs** (Juanjo: «quisiera también que marcases en el mapa el
   torrent dels Gorgs que creo que nace en la uab»): de la misma red del ICGC.
-  Nace en las granjas de la Facultad de Veterinaria de la UAB (41,5061 N;
-  2,0962 E) como torrent de Can Miró, baja como torrent de Can Magrans y
-  desemboca en la riera en Montflorit como torrent dels Gorgs (topónimo del
-  ICGC en Cerdanyola); 4,4 km. En su propia capa (`part: afluent`), con su
+  Nace en Bellaterra, junto a la vía del tren y al campus de la UAB, al lado de
+  Can Domènec (41,5056 N; 2,0933 E), como torrent de Can Miró; baja como
+  torrent de Can Magrans y desemboca en la riera en Montflorit como torrent
+  dels Gorgs (topónimo del ICGC en Cerdanyola); 4,6 km. El nacimiento es el
+  extremo de su red más alejado de la desembocadura; se tomó primero el punto
+  más al norte (granjas de Veterinaria), unos 255 m más abajo, y Juanjo vio en
+  el mapa que nacía antes. En su propia capa (`part: afluent`), con su
   color, en la leyenda y en el selector; el botón del ojo también lo oculta, y
   la distancia del menú de un punto sigue midiéndose solo a la riera.
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
