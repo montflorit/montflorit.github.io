@@ -47,6 +47,19 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
 - **Zoom**: hasta el nivel 21; la rueda, suave (Juanjo: «los saltos son
   demasiado grandes»). Por encima del 19, las teselas de OpenStreetMap y del
   ICGC se amplían sin más detalle; las ortofotos antiguas sí ganan detalle.
+- **Pantalla completa** (Juanjo: «quiero que el mapa pueda verse a pantalla
+  completa»): botón bajo el zoom. Donde el navegador lo permite (ordenador,
+  Android), la pantalla completa del sistema; en el iPhone, que solo la da a
+  los vídeos, el mapa ocupa toda la ventana. Esc o el mismo botón salen.
+- **Menú de un punto** con el botón derecho o manteniendo el dedo (Juanjo:
+  «pueden salir varias opciones como copiar coordenadas o abrir en google
+  maps? puedes añadir más funcionalidades»): las coordenadas, a qué distancia
+  pasa la riera (y si allí va cubierta), copiar las coordenadas, compartir un
+  enlace al punto (menú de compartir del dispositivo; si no hay, se copia) y
+  abrirlo en Google Maps, OpenStreetMap o el visor del ICGC. Con el teclado,
+  la tecla de menú o Mayús+F10 lo abren en el centro del mapa. Un enlace
+  `riera/#punt=lat,lon` abre el mapa centrado en el punto, marcado. Son enlaces
+  que sigue quien quiere: el mapa no pide nada a esos servicios.
 - **Leyenda debajo del mapa**, en HTML: en el móvil no tapa el mapa y se lee
   sin depender del color (cada estado tiene su trazo).
 - **Leaflet servido desde la propia web**, no desde un CDN.
