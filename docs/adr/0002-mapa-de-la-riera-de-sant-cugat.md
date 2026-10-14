@@ -83,6 +83,16 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   con GetLegendGraphic) sale bajo el mapa solo cuando hay una activa. Se
   descartó `aplicacions.aca.gencat.cat/geoserver`, que también responde, porque
   no es el servicio que la ACA publica para terceros.
+- **La red de la ACA sigue el curso antiguo en Sant Cugat** (Juanjo vio que no
+  coincidía con el trazado y que pasaba junto al pollancre). Sus datos (WFS
+  `AIGUA_XARXA_RIUS_ARC`) son de diciembre de 2000, de la «Xarxa 50m»
+  (1:50.000), con un vértice cada 33 m de mediana. Medido en el tramo cubierto:
+  queda a 6 m de mediana del curso antiguo (mapa de 1987 y ortofotos) y a 11 m
+  del actual del ICGC (90 %: 47 m y 95 m); el pollancre, a 16 m de la ACA y a
+  124 m del ICGC. Se mantiene el ICGC como trazado (actual, 1:5.000) y el texto
+  del mapa avisa de que la capa de la ACA enseña el curso antiguo. Sin
+  confirmar: que el ICGC sea exactamente el conducto; lo dirían los planos del
+  alcantarillado del Ajuntament.
 - **Botón del ojo** (Juanjo: «quiero un botón o similar para mostrar/ocultar
   las líneas dibujadas sobre el mapa»): oculta el trazado, los límites del
   barrio y los puntos, para ver limpio el mapa de debajo; al volver a
