@@ -16,8 +16,9 @@ const TEXTOS = {
     tracat: '<a href="../fonts.html">Fonts</a>',
     fons: {
       osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: '<strong>Ortofoto actual (ICGC)</strong>',
-      o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
+      antiga: 'Ortofotos antigues (ICGC)',
     },
+    decades: 'Any de l\'ortofoto antiga',
     capes: {
       barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs i afluents', afluents: 'Altres afluents de la riera',
       xarxa: 'Xarxa hidrogràfica (ACA)',
@@ -67,8 +68,9 @@ const TEXTOS = {
     tracat: '<a href="../fonts.html">Fuentes</a>',
     fons: {
       osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: '<strong>Ortofoto actual (ICGC)</strong>',
-      o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
+      antiga: 'Ortofotos antiguas (ICGC)',
     },
+    decades: 'Año de la ortofoto antigua',
     capes: {
       barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs y afluentes', afluents: 'Otros afluentes de la riera',
       xarxa: 'Red hidrográfica (ACA)',
@@ -135,8 +137,21 @@ mapa.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blan
 const tesseles = (url, atribucio) => L.tileLayer(url, {
   maxZoom: 21, maxNativeZoom: 19, attribution: atribucio + ' · ' + T.tracat,
 });
-const ortofotoAntiga = (capa, any) => L.tileLayer.wms('https://geoserveis.icgc.cat/servei/catalunya/orto-territorial/wms', {
-  layers: capa, format: 'image/jpeg', maxZoom: 21, attribution: T.ortoAny(any) + ' · ' + T.tracat,
+// Les ortofotos antigues, una per dècada (Juanjo, 14-10-2026): un sol fons i, a sota,
+// una regleta per passar d'una a l'altra. L'ICGC no en té cap dels anys seixanta;
+// dels noranta, la de 1994-1997, que té més detall que les de 1990 i 1993.
+const DECADES = [
+  ['ortofoto_blanc_i_negre_1945-1946', '1946'],
+  ['ortofoto_blanc_i_negre_1956-1957', '1956'],
+  ['ortofoto_blanc_i_negre_1970-1977', '1970-77'],
+  ['ortofoto_blanc_i_negre_1983-1989', '1983-89'],
+  ['ortofoto_blanc_i_negre_1994-1997', '1994-97'],
+  ['ortofoto_color_2000-2003', '2000-03'],
+  ['ortofoto_color_2010', '2010'],
+];
+const atribucioAntiga = (any) => T.ortoAny(any) + ' · ' + T.tracat;
+const ortoAntiga = L.tileLayer.wms('https://geoserveis.icgc.cat/servei/catalunya/orto-territorial/wms', {
+  layers: DECADES[0][0], format: 'image/jpeg', maxZoom: 21, attribution: atribucioAntiga(DECADES[0][1]),
 });
 const fonsOsm = tesseles('https://tile.openstreetmap.org/{z}/{x}/{y}.png', T.osm).addTo(mapa);
 const fons = {
@@ -144,9 +159,7 @@ const fons = {
   [T.fons.carrers]: tesseles('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/estandard/MON3857NW/{z}/{x}/{y}.png', T.icgc),
   [T.fons.topo]: tesseles('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/topografic/MON3857NW/{z}/{x}/{y}.png', T.icgc),
   [T.fons.orto]: tesseles('https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.jpeg', T.icgc),
-  [T.fons.o46]: ortofotoAntiga('ortofoto_blanc_i_negre_1945-1946', '1946'),
-  [T.fons.o56]: ortofotoAntiga('ortofoto_blanc_i_negre_1956-1957', '1956'),
-  [T.fons.o77]: ortofotoAntiga('ortofoto_blanc_i_negre_1970-1977', '1970-1977'),
+  [T.fons.antiga]: ortoAntiga,
 };
 
 // Les capes de l'Agència Catalana de l'Aigua, del seu servei oficial de visualització.
@@ -315,6 +328,38 @@ const ControlCompleta = L.Control.extend({
   },
 });
 new ControlCompleta().addTo(mapa);
+
+// --- La regleta de les dècades, només quan el fons és l'ortofoto antiga ---
+let regleta;
+function triaDecada(n) {
+  const [capa, any] = DECADES[n];
+  mapa.attributionControl.removeAttribution(ortoAntiga.options.attribution);
+  ortoAntiga.options.attribution = atribucioAntiga(any);
+  mapa.attributionControl.addAttribution(ortoAntiga.options.attribution);
+  ortoAntiga.setParams({ layers: capa });
+  regleta.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-pressed', i === n ? 'true' : 'false'));
+}
+const ControlDecades = L.Control.extend({
+  options: { position: 'bottomleft' },
+  onAdd() {
+    regleta = L.DomUtil.create('div', 'leaflet-bar regleta-decades');
+    regleta.setAttribute('role', 'group');
+    regleta.setAttribute('aria-label', T.decades);
+    regleta.hidden = true;
+    DECADES.forEach(([, any], n) => {
+      const b = L.DomUtil.create('button', '', regleta);
+      b.type = 'button';
+      b.textContent = any;
+      b.setAttribute('aria-pressed', n === 0 ? 'true' : 'false');
+      L.DomEvent.on(b, 'click', () => triaDecada(n));
+    });
+    L.DomEvent.disableClickPropagation(regleta);
+    L.DomEvent.disableScrollPropagation(regleta);
+    return regleta;
+  },
+});
+new ControlDecades().addTo(mapa);
+mapa.on('baselayerchange', (e) => { regleta.hidden = e.layer !== ortoAntiga; });
 
 // Mentre hi ha una finestreta oberta, els botons del mapa s'aparten perquè no la tapin
 // (al mòbil no hi ha lloc per a tots dos). Tornen en tancar-la.

@@ -253,3 +253,18 @@ body.sense-desplacament { overflow: hidden; }
 .prof.p3 { background: #e31005; }
 .prof.p4 { background: #8c124f; }
 .prof.p5 { background: #f542e3; }
+
+/* La regleta de les dècades de l'ortofoto antiga. */
+.regleta-decades { display: flex; flex-wrap: wrap; gap: 1px; max-width: calc(100vw - 4rem); background: #ccc; }
+.regleta-decades[hidden] { display: none; }
+.regleta-decades button {
+  flex: 1 0 auto;
+  border: 0;
+  background: #fff;
+  color: #1c2430;
+  font: 600 .85rem/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: .45rem .55rem;
+  cursor: pointer;
+}
+.regleta-decades button:hover { background: #f1f4f8; }
+.regleta-decades button[aria-pressed="true"] { background: #1d4ed8; color: #fff; }

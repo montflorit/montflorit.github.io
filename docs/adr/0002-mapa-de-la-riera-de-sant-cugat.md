@@ -143,6 +143,14 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   persistente»): como en Temps a Montflorit, el idioma elegido en el selector
   se guarda en el dispositivo (`montflorit.idioma`) y cada página se abre en
   ese idioma; sin elegir, cada página en el suyo.
+- **Ortofotos antiguas, una por década** (Juanjo: «y una de cada década?» y,
+  entre la serie completa en el selector y una regleta, «la regleta por
+  décadas, hazlo»). Un solo fondo, «Ortofotos antigues (ICGC)», y bajo el mapa
+  una regleta con 1946, 1956, 1970-77, 1983-89, 1994-97, 2000-03 y 2010 que
+  cambia la capa del WMS del ICGC. Sin años sesenta: el ICGC no tiene ortofoto
+  de esa década. De los noventa, la de 1994-1997 (50 cm); las de 1990 y 1993
+  son de 2,5 m. Así el selector no crece (en el iPhone SE ya había que
+  desplazarlo).
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa
