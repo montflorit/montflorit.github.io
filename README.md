@@ -33,7 +33,7 @@ Leaflet, se sirve desde esta web.
 | `eines/construeix.py` | Genera las páginas publicables (`index.html`, `riera/`, `fonts.html`, `privacitat.html` y sus versiones en `es/`) con la cabecera, el selector de idioma, el tema y el pie comunes. Las páginas generadas no se editan a mano. |
 | `estil.css`, `tema.js` | El aspecto, con los colores de Temps a Montflorit, y el conmutador de tema claro u oscuro. |
 | `riera/mapa.js` | El mapa de la riera (Leaflet), con sus textos en los dos idiomas. |
-| `dades/riera-sant-cugat.geojson` | El trazado de la riera, de la base topográfica 1:5.000 del ICGC; bajo Sant Cugat, de la capa «Rieres i torrents» del Ajuntament; dos tramos de OpenStreetMap; tramo a tramo: `nom`, `part` (`capcalera`, `sant-cugat`, `riera`), `estat` (`obert`, `cobert`) y `font` (`icgc`, `santcugat`, `osm`). ODbL. |
+| `dades/riera-sant-cugat.geojson` | El trazado de la riera, de la base topográfica 1:5.000 del ICGC; bajo Sant Cugat, de la capa «Rieres i torrents» del Ajuntament; dos tramos de OpenStreetMap; tramo a tramo: `nom`, `part` (`capcalera`, `sant-cugat`, `riera`), `estat` (`obert`, `cobert`) y `font` (`icgc`, `santcugat`, `osm`) y, si otras fuentes le dan otro nombre, `altres`. Incluye el torrent dels Gorgs (`part`: `afluent`). ODbL. |
 | `dades/montflorit-limits.geojson` | Los límites del barrio, copiados de Temps a Montflorit. |
 | `vendor/leaflet/` | Leaflet 1.9.4 (BSD-2-Clause). |
 | `eines/servidor.py`, `eines/editor.html` | Servidor local para probar la web y editor del trazado (ADR 0003). No se publican. |

@@ -37,7 +37,7 @@ L.control.layers(bases,{},{collapsed:false,position:'topright'}).addTo(map);
 
 const colAlto='#e8590c', colRiera='#1864ab';
 function estilo(p){
-  const col=p.part==='capcalera'?colAlto:colRiera;
+  const col=p.part==='capcalera'?colAlto:p.part==='afluent'?'#0b7a75':colRiera;
   if(p.estat!=='cobert') return {color:col,weight:5,dashArray:null};
   return {color:col,weight:5,dashArray:'8 6'};
 }
@@ -129,7 +129,7 @@ panel.onAdd=()=>{const d=L.DomUtil.create('div','panel');d.innerHTML=`<h1>Editor
 <div id="estado">Sin cambios</div>
 <div id="ficha">
  <label>Nombre (vacío si no tiene)</label><input type="text" id="f-nombre">
- <label>Parte del recorrido</label><select id="f-tramo"><option value="capcalera">Cabecera (naranja)</option><option value="sant-cugat">Paso por Sant Cugat (azul)</option><option value="riera">Riera de Sant Cugat (azul)</option></select>
+ <label>Parte del recorrido</label><select id="f-tramo"><option value="capcalera">Cabecera (naranja)</option><option value="sant-cugat">Paso por Sant Cugat (azul)</option><option value="riera">Riera de Sant Cugat (azul)</option><option value="afluent">Afluente: torrent dels Gorgs (verde azulado)</option></select>
  <label>Estado</label><select id="f-estado"><option value="obert">A cielo abierto (línea continua)</option><option value="cobert">Cubierta (línea discontinua)</option></select>
  <label>Fuente</label><select id="f-fuente"><option value="icgc">Base topográfica 1:5.000 del ICGC</option><option value="santcugat">Ajuntament de Sant Cugat (Rieres i torrents)</option><option value="osm">OpenStreetMap</option></select>
  <div class="fila"><button onclick="aplicaFicha()">Aplicar</button><button onclick="ocultarFicha()">Cerrar</button></div>

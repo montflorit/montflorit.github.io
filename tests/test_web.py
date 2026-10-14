@@ -104,20 +104,31 @@ def test_tracat_valid():
     for f in gj["features"]:
         p = f["properties"]
         assert f["geometry"]["type"] == "LineString" and len(f["geometry"]["coordinates"]) >= 2
-        assert p["part"] in ("capcalera", "sant-cugat", "riera")
+        assert p["part"] in ("capcalera", "sant-cugat", "riera", "afluent")
         assert p["estat"] in ("obert", "cobert")
         assert p["font"] in ("icgc", "santcugat", "osm")
         for lon, lat in f["geometry"]["coordinates"]:
-            assert 2.05 < lon < 2.20 and 41.40 < lat < 41.50, "coordenada fora de la zona"
+            assert 2.05 < lon < 2.20 and 41.40 < lat < 41.52, "coordenada fora de la zona"
 
 
 def test_tracat_continu():
-    """Cada tram comença on acaba l'anterior (menys d'1 m), de la font al Ripoll."""
-    trams = json.loads(llegeix("dades/riera-sant-cugat.geojson"))["features"]
+    """Cada tram comença on acaba l'anterior (menys d'1 m), de la font al Ripoll; i l'afluent, igual fins a la riera."""
+    trams = [f for f in json.loads(llegeix("dades/riera-sant-cugat.geojson"))["features"] if f["properties"]["part"] != "afluent"]
     for anterior, seguent in zip(trams, trams[1:]):
         (x1, y1), (x2, y2) = anterior["geometry"]["coordinates"][-1], seguent["geometry"]["coordinates"][0]
         metres = ((x1 - x2) * 83500) ** 2 + ((y1 - y2) * 111000) ** 2
         assert metres ** 0.5 < 1, f"salt entre {anterior['properties']} i {seguent['properties']}"
+
+
+def test_afluent_continu_fins_a_la_riera():
+    """El torrent dels Gorgs va seguit i acaba a sobre de la riera (menys d'1 m)."""
+    totes = json.loads(llegeix("dades/riera-sant-cugat.geojson"))["features"]
+    afl = [f["geometry"]["coordinates"] for f in totes if f["properties"]["part"] == "afluent"]
+    riera = [p for f in totes if f["properties"]["part"] == "riera" for p in f["geometry"]["coordinates"]]
+    metres = lambda a, b: (((a[0] - b[0]) * 83500) ** 2 + ((a[1] - b[1]) * 111000) ** 2) ** 0.5
+    for anterior, seguent in zip(afl, afl[1:]):
+        assert metres(anterior[-1], seguent[0]) < 1
+    assert min(metres(afl[-1][-1], p) for p in riera) < 1
 
 
 def test_limits_iguals_que_temps_a_montflorit():

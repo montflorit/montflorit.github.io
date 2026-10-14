@@ -19,7 +19,7 @@ const TEXTOS = {
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
-      barri: 'Límits de Montflorit',
+      barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs',
       xarxa: 'Xarxa hidrogràfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} anys (ACA)`,
     },
@@ -34,6 +34,9 @@ const TEXTOS = {
     },
     barri: 'Límits del barri de Montflorit',
     rabassalet: 'Font del Rabassalet: aquí neix la riera segons la Gran Enciclopèdia Catalana. Seca, segons la fitxa de la Diputació revisada el 2025.',
+    naixGorgs: 'Naixement del torrent dels Gorgs: granges de la Facultat de Veterinària de la UAB (Bellaterra)',
+    altres: 'Altres noms',
+    nomsFonts: { Ajuntament: 'Ajuntament de Sant Cugat', OpenStreetMap: 'OpenStreetMap', ACA: 'ACA' },
     pollancre: 'Pollancre de l\'antiga riera de Can Mora (inventari del patrimoni de la Diputació de Barcelona)',
     desembocadura: 'Desemboca al Ripoll (Montcada i Reixac)',
     mapa: 'Mapa de la riera de Sant Cugat',
@@ -64,7 +67,7 @@ const TEXTOS = {
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
-      barri: 'Límites de Montflorit',
+      barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs',
       xarxa: 'Red hidrográfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} años (ACA)`,
     },
@@ -79,6 +82,9 @@ const TEXTOS = {
     },
     barri: 'Límites del barrio de Montflorit',
     rabassalet: 'Font del Rabassalet: aquí nace la riera según la Gran Enciclopèdia Catalana. Seca, según la ficha de la Diputació revisada en 2025.',
+    naixGorgs: 'Nacimiento del torrent dels Gorgs: granjas de la Facultad de Veterinaria de la UAB (Bellaterra)',
+    altres: 'Otros nombres',
+    nomsFonts: { Ajuntament: 'Ayuntamiento de Sant Cugat', OpenStreetMap: 'OpenStreetMap', ACA: 'ACA' },
     pollancre: 'Chopo de la antigua riera de Can Mora (inventario del patrimonio de la Diputació de Barcelona)',
     desembocadura: 'Desemboca en el Ripoll (Montcada i Reixac)',
     mapa: 'Mapa de la riera de Sant Cugat',
@@ -148,17 +154,28 @@ const inundables = { 10: capaAca('AIGUA_CALAT_BESOS_Y10'), 100: capaAca('AIGUA_C
 
 // --- Estil de cada tram ---
 function estilTram(p) {
-  const c = color(p.part === 'capcalera' ? '--capcalera' : '--riera');
-  // Coberta (per sota terra): ratllada.
-  return { color: c, weight: 5, dashArray: p.estat === 'cobert' ? '8 6' : null };
+  const c = color(p.part === 'capcalera' ? '--capcalera' : p.part === 'afluent' ? '--afluent' : '--riera');
+  // Coberta (per sota terra): ratllada. L'afluent, una mica més prim.
+  return { color: c, weight: p.part === 'afluent' ? 4 : 5, dashArray: p.estat === 'cobert' ? '8 6' : null };
 }
 
 function textTram(p) {
   const nom = p.nom || T.senseNom;
-  return `<strong>${nom}</strong>${p.estat === 'cobert' ? ` (${T.cobert})` : ''}<br>${T.font[p.font] || ''}`;
+  // Els noms que hi donen altres fonts (Juanjo, 14-10-2026), per qui els trobi en altres mapes.
+  const altres = (p.altres || []).map((a) => `${a.nom} (${a.fonts.map((f) => T.nomsFonts[f] || f).join(', ')})`);
+  return `<strong>${nom}</strong>${p.estat === 'cobert' ? ` (${T.cobert})` : ''}`
+    + (altres.length ? `<br>${T.altres}: ${altres.join('; ')}` : '')
+    + `<br>${T.font[p.font] || ''}`;
 }
 
 const capaRiera = L.geoJSON(null, {
+  filter: (f) => f.properties.part !== 'afluent',
+  style: (f) => estilTram(f.properties),
+  onEachFeature: (f, capa) => capa.bindTooltip(textTram(f.properties), { sticky: true }),
+});
+// El torrent dels Gorgs, que desemboca a la riera a Montflorit, en una capa a part.
+const capaGorgs = L.geoJSON(null, {
+  filter: (f) => f.properties.part === 'afluent',
   style: (f) => estilTram(f.properties),
   onEachFeature: (f, capa) => capa.bindTooltip(textTram(f.properties), { sticky: true }),
 });
@@ -177,6 +194,7 @@ function punt(lat, lon, text, opcions) {
 
 L.control.layers(fons, {
   [T.capes.barri]: capaBarri,
+  [T.capes.gorgs]: capaGorgs,
   [T.capes.xarxa]: xarxaAca,
   [T.capes.inundable(10)]: inundables[10],
   [T.capes.inundable(100)]: inundables[100],
@@ -257,7 +275,7 @@ let botoDibuixos;
 let marcaCompartida = null;
 
 function dibuixos() {
-  return [capaRiera, capaBarri, puntsDeReferencia, marcaCompartida].filter(Boolean);
+  return [capaRiera, capaGorgs, capaBarri, puntsDeReferencia, marcaCompartida].filter(Boolean);
 }
 
 function actualitzaBotoDibuixos() {
@@ -306,7 +324,7 @@ document.addEventListener('keydown', (e) => {
 
 // Els colors es tornen a posar si canvia el tema (tema.js avisa amb «canvi-tema»).
 function repintaColors() {
-  capaRiera.eachLayer((capa) => capa.setStyle(estilTram(capa.feature.properties)));
+  [capaRiera, capaGorgs].forEach((c) => c.eachLayer((capa) => capa.setStyle(estilTram(capa.feature.properties))));
   capaBarri.setStyle({ color: color('--barri'), fillColor: color('--barri') });
   puntsDeReferencia.eachLayer((capa) => capa.setStyle({ fillColor: color(capa.options.variableColor) }));
 }
@@ -431,16 +449,23 @@ Promise.all([
   else mapa.fitBounds(L.geoJSON(riera).getBounds(), { padding: [20, 20] });
   capaBarri.addData(barri).addTo(mapa);
   capaRiera.addData(riera).addTo(mapa);
+  capaGorgs.addData(riera).addTo(mapa);
   tracatRiera = capaRiera.getLayers();
   if (compartit) {
     marcaCompartida = L.marker(compartit, { title: T.menu.punt, alt: T.menu.punt }).addTo(mapa)
       .bindTooltip(`${T.menu.punt}: ${coordenades(compartit)}`, { permanent: true, direction: 'top', offset: [0, -30] });
   }
   const trams = riera.features;
-  const darrer = trams[trams.length - 1].geometry.coordinates;
+  const principals = trams.filter((f) => f.properties.part !== 'afluent');
+  const darrer = principals[principals.length - 1].geometry.coordinates;
   const fi = darrer[darrer.length - 1];
   // La font, al lloc de la fitxa de la Diputació; el traçat comença una mica més avall.
   punt(41.430139, 2.106803, T.rabassalet, { variableColor: '--capcalera', fillColor: color('--capcalera') });
+  const gorgs = trams.filter((f) => f.properties.part === 'afluent');
+  if (gorgs.length) {
+    const naix = gorgs[0].geometry.coordinates[0];
+    punt(naix[1], naix[0], T.naixGorgs, { radius: 6, variableColor: '--afluent', fillColor: color('--afluent') });
+  }
   punt(41.469438, 2.083075, T.pollancre, { radius: 5, variableColor: '--riera', fillColor: color('--riera') });
   punt(fi[1], fi[0], T.desembocadura, { variableColor: '--riera', fillColor: color('--riera') });
   puntsDeReferencia.addTo(mapa);

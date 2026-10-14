@@ -28,7 +28,7 @@ def valida(gj):
     for f in gj["features"]:
         assert f["geometry"]["type"] == "LineString", "cada tram ha de ser una línia"
         p = f["properties"]
-        assert p.get("part") in ("capcalera", "sant-cugat", "riera"), f"part desconeguda: {p.get('part')}"
+        assert p.get("part") in ("capcalera", "sant-cugat", "riera", "afluent"), f"part desconeguda: {p.get('part')}"
         assert p.get("estat") in ("obert", "cobert"), f"estat desconegut: {p.get('estat')}"
         assert p.get("font") in ("icgc", "santcugat", "osm"), f"font desconeguda: {p.get('font')}"
 

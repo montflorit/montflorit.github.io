@@ -71,6 +71,25 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
 - **Fuera la capa del mapa de 1987** (Juanjo: «quita la capa de 1987»): solo
   cubría el centro de Sant Cugat y las ortofotos antiguas ya enseñan el curso
   de antes; pesaba 1 MB.
+- **Nombres y nombres alternativos** (Juanjo vio que OpenStreetMap llama riera
+  de Can Trabal a lo que el mapa llama riera de Can Mòra y pidió revisar el
+  resto). Comparados tramo a tramo el ICGC, el Ajuntament («Rieres i
+  torrents»), OpenStreetMap y la ACA. Los del ICGC son los que da su buscador
+  de topónimos (riera de Can Mòra junto al golf, riera de Can Trabal más
+  arriba, torrent de Can Cortès, riera de Can Bova, riera de Can Vilallonga);
+  no figuran torrent del Rabassalet, torrent de Can Bova, riera de Vilallonga
+  ni torrent de Can Trabal. Se mantienen los del ICGC y cada tramo lleva en
+  `altres` los que le dan las otras fuentes (en el 30 % o más del tramo), que
+  salen en el texto emergente. La ACA llama riera de Sant Cugat a todo el curso
+  desde la fuente.
+- **Torrent dels Gorgs** (Juanjo: «quisiera también que marcases en el mapa el
+  torrent dels Gorgs que creo que nace en la uab»): de la misma red del ICGC.
+  Nace en las granjas de la Facultad de Veterinaria de la UAB (41,5061 N;
+  2,0962 E) como torrent de Can Miró, baja como torrent de Can Magrans y
+  desemboca en la riera en Montflorit como torrent dels Gorgs (topónimo del
+  ICGC en Cerdanyola); 4,4 km. En su propia capa (`part: afluent`), con su
+  color, en la leyenda y en el selector; el botón del ojo también lo oculta, y
+  la distancia del menú de un punto sigue midiéndose solo a la riera.
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa

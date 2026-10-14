@@ -13,6 +13,7 @@
   --capcalera: #c2410c;     /* la capçalera de la riera, al mapa */
   --riera: #1864ab;         /* la riera de Sant Cugat */
   --barri: #b0124a;         /* els límits de Montflorit */
+  --afluent: #0b7a75;       /* el torrent dels Gorgs */
   color-scheme: light;
 }
 
@@ -26,6 +27,7 @@
   --capcalera: #fb8a4c;
   --riera: #74b0f0;
   --barri: #f472a6;
+  --afluent: #3cc4bd;
   color-scheme: dark;
 }
 
@@ -193,6 +195,7 @@ body.sense-desplacament { overflow: hidden; }
 .llegenda .riera { border-color: var(--riera); }
 .llegenda .cobert { border-color: var(--riera); border-top-style: dashed; }
 .llegenda .barri { border-color: var(--barri); border-top-style: dashed; }
+.llegenda .afluent { border-color: var(--afluent); }
 .ajuda-mapa { margin: .4rem 0 0; color: var(--suau); font-size: .9rem; }
 
 /* --- Peu --- */
