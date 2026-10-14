@@ -13,7 +13,7 @@ const TEXTOS = {
     osm: 'Mapa: © <a href="https://www.openstreetmap.org/copyright/ca" target="_blank" rel="noopener">col·laboradors d\'OpenStreetMap</a>',
     icgc: 'Mapa: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis" target="_blank" rel="noopener">Institut Cartogràfic i Geològic de Catalunya</a>',
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-Ortoimatges/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
-    tracat: 'Traçat: ICGC, Ajuntament de Sant Cugat i OpenStreetMap (<a href="../fonts.html">fonts</a>)',
+    tracat: '<a href="../fonts.html">Fonts</a>',
     fons: {
       osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: '<strong>Ortofoto actual (ICGC)</strong>',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
@@ -63,7 +63,7 @@ const TEXTOS = {
     osm: 'Mapa: © <a href="https://www.openstreetmap.org/copyright/es" target="_blank" rel="noopener">colaboradores de OpenStreetMap</a>',
     icgc: 'Mapa: <a href="https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios" target="_blank" rel="noopener">Institut Cartogràfic i Geològic de Catalunya</a>',
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios/WMS-Ortoimagenes/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
-    tracat: 'Trazado: ICGC, Ayuntamiento de Sant Cugat y OpenStreetMap (<a href="../fonts.html">fuentes</a>)',
+    tracat: '<a href="../fonts.html">Fuentes</a>',
     fons: {
       osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: '<strong>Ortofoto actual (ICGC)</strong>',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
@@ -175,31 +175,45 @@ function textTram(p) {
     + `<br>${T.font[p.font] || ''}`;
 }
 
+// La informació de cada element: al pas del ratolí a l'ordinador; en pantalles
+// tàctils, una finestreta en tocar-lo, que Leaflet desplaça perquè hi càpiga
+// sencera (Juanjo, 14-10-2026: al mòbil el text emergent no hi cabia).
+const TACTIL = matchMedia('(hover: none)').matches;
+// Ample màxim d'una finestreta: 280 px, o menys si el mapa és més estret (iPhone SE).
+// Leaflet hi afegeix uns 50 px de marges i vora.
+function ampleFinestreta() {
+  return Math.max(160, Math.min(280, mapa.getSize().x - 64));
+}
+function informacio(capa, html, opcions) {
+  if (TACTIL) return capa.bindPopup(html, { maxWidth: ampleFinestreta(), autoPanPadding: [12, 12], className: 'popup-info' });
+  return capa.bindTooltip(html, opcions);
+}
+
 const capaRiera = L.geoJSON(null, {
   filter: (f) => f.properties.part !== 'afluent',
   style: (f) => estilTram(f.properties),
-  onEachFeature: (f, capa) => capa.bindTooltip(textTram(f.properties), { sticky: true }),
+  onEachFeature: (f, capa) => informacio(capa, textTram(f.properties), { sticky: true }),
 });
 // El torrent dels Gorgs, que desemboca a la riera a Montflorit, en una capa a part.
 const capaGorgs = L.geoJSON(null, {
   filter: (f) => f.properties.part === 'afluent',
   style: (f) => estilTram(f.properties),
-  onEachFeature: (f, capa) => capa.bindTooltip(textTram(f.properties), { sticky: true }),
+  onEachFeature: (f, capa) => informacio(capa, textTram(f.properties), { sticky: true }),
 });
 const capaBarri = L.geoJSON(null, {
   style: () => ({ color: color('--barri'), weight: 3, dashArray: '10 5 2 5', fillColor: color('--barri'), fillOpacity: 0.08 }),
-  onEachFeature: (f, capa) => capa.bindTooltip(T.barri, { sticky: true }),
+  onEachFeature: (f, capa) => informacio(capa, T.barri, { sticky: true }),
 });
 
 // Els tres punts de referència.
 const puntsDeReferencia = L.layerGroup();
 function punt(lat, lon, text, opcions) {
-  return L.circleMarker([lat, lon], Object.assign({ radius: 7, color: '#fff', weight: 2, fillOpacity: 1 }, opcions))
-    .bindTooltip(text, { direction: 'top' })
-    .addTo(puntsDeReferencia);
+  const marca = L.circleMarker([lat, lon], Object.assign({ radius: 7, color: '#fff', weight: 2, fillOpacity: 1 }, opcions));
+  informacio(marca, text, { direction: 'top' });
+  return marca.addTo(puntsDeReferencia);
 }
 
-L.control.layers(fons, {
+const selectorCapes = L.control.layers(fons, {
   [T.capes.barri]: capaBarri,
   [T.capes.gorgs]: capaGorgs,
   [T.capes.xarxa]: xarxaAca,
@@ -207,6 +221,25 @@ L.control.layers(fons, {
   [T.capes.inundable(100)]: inundables[100],
   [T.capes.inundable(500)]: inundables[500],
 }, { position: 'topright' }).addTo(mapa);
+
+// En pantalles tàctils, el selector s'obre i es tanca amb el mateix botó. Leaflet
+// l'obre en tocar-lo, però a Chrome d'Android el clic que ve darrere el tornava a
+// tancar de seguida (comprovat amb l'emulació del Pixel 7). Tocar el mapa el tanca.
+if (TACTIL) {
+  const caixaCapes = selectorCapes.getContainer();
+  const botoCapes = caixaCapes.querySelector('.leaflet-control-layers-toggle');
+  L.DomEvent.off(caixaCapes);
+  L.DomEvent.off(botoCapes);
+  L.DomEvent.disableClickPropagation(caixaCapes);
+  L.DomEvent.disableScrollPropagation(caixaCapes);
+  botoCapes.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (caixaCapes.classList.contains('leaflet-control-layers-expanded')) selectorCapes.collapse();
+    else selectorCapes.expand();
+  });
+  // En triar un fons, es tanca sol; les capes de sobre se'n poden marcar diverses.
+  mapa.on('baselayerchange', () => selectorCapes.collapse());
+}
 
 // La llegenda de la profunditat, només quan hi ha alguna zona inundable a la vista.
 function llegendaInundable() {
@@ -269,6 +302,11 @@ const ControlCompleta = L.Control.extend({
   },
 });
 new ControlCompleta().addTo(mapa);
+
+// Mentre hi ha una finestreta oberta, els botons del mapa s'aparten perquè no la tapin
+// (al mòbil no hi ha lloc per a tots dos). Tornen en tancar-la.
+mapa.on('popupopen', () => contenidor.classList.add('amb-finestreta'));
+mapa.on('popupclose', () => contenidor.classList.remove('amb-finestreta'));
 
 // --- Mostrar o amagar el que hi ha dibuixat (Juanjo, 14-10-2026) ---
 // El traçat, els límits del barri i els punts, per veure el mapa de sota net.
@@ -425,7 +463,7 @@ function obreMenu(latlng) {
   enllac(T.menu.google, `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`);
   enllac(T.menu.osm, `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=18/${lat}/${lon}`);
   enllac(T.menu.icgc, `https://visors.icgc.cat/contextmaps/#18/${lat}/${lon}`);
-  L.popup({ className: 'popup-punt', maxWidth: 280 }).setLatLng(latlng).setContent(caixa).openOn(mapa);
+  L.popup({ className: 'popup-punt', maxWidth: ampleFinestreta() }).setLatLng(latlng).setContent(caixa).openOn(mapa);
   caixa.querySelector('button').focus();
 }
 
@@ -450,10 +488,12 @@ Promise.all([
   fetch(ARREL + 'dades/riera-sant-cugat.geojson').then((r) => r.json()),
   fetch(ARREL + 'dades/montflorit-limits.geojson').then((r) => r.json()),
 ]).then(([riera, barri]) => {
-  // Primer s'enquadra tot el recorregut (o el punt d'un enllaç compartit), i després s'hi posen les capes.
+  // Primer s'enquadra la vista (o el punt d'un enllaç compartit), i després s'hi posen les capes.
   const compartit = puntDeLEnllac();
   if (compartit) mapa.setView(compartit, 17);
-  else mapa.fitBounds(L.geoJSON(riera).getBounds(), { padding: [20, 20] });
+  // En obrir la pàgina, Montflorit amb la riera i el torrent dels Gorgs al voltant
+  // (Juanjo, 14-10-2026); el recorregut sencer, allunyant el zoom.
+  else mapa.fitBounds(L.geoJSON(barri).getBounds().pad(0.2));
   capaBarri.addData(barri).addTo(mapa);
   capaRiera.addData(riera).addTo(mapa);
   capaGorgs.addData(riera).addTo(mapa);

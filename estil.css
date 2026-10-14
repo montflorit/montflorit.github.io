@@ -148,6 +148,20 @@ h1 { margin: 0; font-size: 1.6rem; line-height: 1.2; }
 }
 .mapa:focus-visible { outline-offset: 0; }
 .leaflet-container { font: .9rem/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+/* Els textos emergents, partits en línies: Leaflet no els parteix i al mòbil
+   sortien del mapa (Juanjo, 14-10-2026: «no cabe»). */
+.mapa.amb-finestreta .leaflet-control-container { visibility: hidden; }
+@media (max-width: 40rem) {
+  .leaflet-control-attribution { font-size: .7rem; }
+}
+/* El selector de capes obert deixa una franja de mapa a l'esquerra, per tancar-lo tocant-lo. */
+.leaflet-control-layers-expanded { max-width: calc(100vw - 7rem); }
+.leaflet-tooltip {
+  white-space: normal;
+  width: max-content;
+  max-width: min(20rem, 75vw);
+  overflow-wrap: break-word;
+}
 
 /* Pantalla completa: la de debò (:fullscreen) o, on no n'hi ha, tota la finestra. */
 .mapa:fullscreen { width: 100%; height: 100%; border: 0; border-radius: 0; }

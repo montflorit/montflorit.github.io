@@ -114,6 +114,17 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   Bonaigua al tramo alto del de Can Domènec (por la Font de Bonaigua, que el
   ICGC sitúa allí): va como nombre alternativo de ese tramo, de la fuente
   hasta la vía. La capa pasa a llamarse «Torrent dels Gorgs i afluents».
+- **Móvil** (Juanjo: «no cabe. la visualización en móvil es correcta?»). Los
+  textos emergentes de Leaflet no parten líneas y salían del mapa: ahora tienen
+  ancho máximo; en pantallas táctiles (`hover: none`) la información sale en
+  una ventanita al tocar, de ancho ajustado al mapa (iPhone SE incluido), y
+  los botones del mapa se ocultan mientras está abierta. Los créditos del mapa
+  se acortan a «Fonts» con enlace. El selector de capas se abría y cerraba a la
+  vez en Chrome de Android (comprobado con el Pixel 7 emulado): en táctil se
+  abre y cierra con su botón, se cierra al elegir un fondo o tocar el mapa, y
+  deja una franja libre para tocarlo.
+- **Vista inicial: Montflorit** (Juanjo envió una captura con el zoom que
+  quería): el barrio con un 20 % de margen; el recorrido entero, alejando.
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa
