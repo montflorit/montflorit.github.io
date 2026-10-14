@@ -13,13 +13,13 @@ const TEXTOS = {
     osm: 'Mapa: © <a href="https://www.openstreetmap.org/copyright/ca" target="_blank" rel="noopener">col·laboradors d\'OpenStreetMap</a>',
     icgc: 'Mapa: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis" target="_blank" rel="noopener">Institut Cartogràfic i Geològic de Catalunya</a>',
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-Ortoimatges/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
-    tracat: 'Traçat: ICGC i OpenStreetMap (<a href="../fonts.html">fonts</a>)',
+    tracat: 'Traçat: ICGC, Ajuntament de Sant Cugat i OpenStreetMap (<a href="../fonts.html">fonts</a>)',
     fons: {
       osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: 'Ortofoto actual (ICGC)',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
-      m1987: 'Mapa de 1987, centre de Sant Cugat (ICC)', barri: 'Límits de Montflorit',
+      barri: 'Límits de Montflorit',
       xarxa: 'Xarxa hidrogràfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} anys (ACA)`,
     },
@@ -30,6 +30,7 @@ const TEXTOS = {
     font: {
       icgc: 'Traçat de la base topogràfica 1:5.000 de l\'ICGC.',
       osm: 'Traçat d\'OpenStreetMap: aquí la base de l\'ICGC té un buit.',
+      santcugat: 'Traçat de l\'Ajuntament de Sant Cugat (capa «Rieres i torrents»), sobre els grans col·lectors de pluvials.',
     },
     barri: 'Límits del barri de Montflorit',
     rabassalet: 'Font del Rabassalet: aquí neix la riera segons la Gran Enciclopèdia Catalana. Seca, segons la fitxa de la Diputació revisada el 2025.',
@@ -57,13 +58,13 @@ const TEXTOS = {
     osm: 'Mapa: © <a href="https://www.openstreetmap.org/copyright/es" target="_blank" rel="noopener">colaboradores de OpenStreetMap</a>',
     icgc: 'Mapa: <a href="https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios" target="_blank" rel="noopener">Institut Cartogràfic i Geològic de Catalunya</a>',
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios/WMS-Ortoimagenes/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
-    tracat: 'Trazado: ICGC y OpenStreetMap (<a href="../fonts.html">fuentes</a>)',
+    tracat: 'Trazado: ICGC, Ayuntamiento de Sant Cugat y OpenStreetMap (<a href="../fonts.html">fuentes</a>)',
     fons: {
       osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: 'Ortofoto actual (ICGC)',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
     },
     capes: {
-      m1987: 'Mapa de 1987, centro de Sant Cugat (ICC)', barri: 'Límites de Montflorit',
+      barri: 'Límites de Montflorit',
       xarxa: 'Red hidrográfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} años (ACA)`,
     },
@@ -74,6 +75,7 @@ const TEXTOS = {
     font: {
       icgc: 'Trazado de la base topográfica 1:5.000 del ICGC.',
       osm: 'Trazado de OpenStreetMap: aquí la base del ICGC tiene un hueco.',
+      santcugat: 'Trazado del Ayuntamiento de Sant Cugat (capa «Rieres i torrents»), sobre los grandes colectores de pluviales.',
     },
     barri: 'Límites del barrio de Montflorit',
     rabassalet: 'Font del Rabassalet: aquí nace la riera según la Gran Enciclopèdia Catalana. Seca, según la ficha de la Diputació revisada en 2025.',
@@ -135,14 +137,6 @@ const fons = {
   [T.fons.o77]: ortofotoAntiga('ortofoto_blanc_i_negre_1970-1977', '1970-1977'),
 };
 
-// El mapa topogràfic 1:5.000 de 1987, ja ajustat a les coordenades d'ara.
-// Només cobreix el centre de Sant Cugat; s'hi pot posar a sobre de qualsevol fons.
-const mapa1987 = L.imageOverlay(ARREL + 'img/mapa-1987-icc.jpg', [[41.4650, 2.0780], [41.4735, 2.0940]], {
-  opacity: 0.6,
-  alt: '',
-  attribution: 'Mapa de 1987: <a href="https://cartotecadigital.icgc.cat/digital/collection/topo5000/id/5766" target="_blank" rel="noopener">ICC</a> (CC BY 4.0)',
-});
-
 // Les capes de l'Agència Catalana de l'Aigua, del seu servei oficial de visualització.
 // Les zones inundables són les de la conca del Besòs, amb la profunditat de l'aigua
 // en una avinguda que, de mitjana, arriba una vegada cada 10, 100 o 500 anys.
@@ -183,7 +177,6 @@ function punt(lat, lon, text, opcions) {
 
 L.control.layers(fons, {
   [T.capes.barri]: capaBarri,
-  [T.capes.m1987]: mapa1987,
   [T.capes.xarxa]: xarxaAca,
   [T.capes.inundable(10)]: inundables[10],
   [T.capes.inundable(100)]: inundables[100],

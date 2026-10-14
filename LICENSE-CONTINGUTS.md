@@ -13,15 +13,12 @@ El codi està sota la llicència AGPL-3.0-or-later: vegeu [LICENSE](LICENSE).
 - `dades/riera-sant-cugat.geojson`: la xarxa hidrogràfica de la base
   topogràfica 1:5.000 de l'Institut Cartogràfic i Geològic de Catalunya
   (reutilitzable citant-ne la font, segons el seu avís legal), amb dos trams
-  curts d'OpenStreetMap; per aquests, el conjunt està sota la
+  curts d'OpenStreetMap i, sota Sant Cugat, la capa «Rieres i torrents» del
+  Geoportal de l'Ajuntament de Sant Cugat del Vallès; pels d'OpenStreetMap, el conjunt està sota la
   [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/).
   © col·laboradors d'OpenStreetMap.
 - `dades/montflorit-limits.geojson`: els límits del barri de Temps a
   Montflorit (`meteo-montflorit/meteo-local`), amb les fonts que s'hi
   expliquen.
-- `img/mapa-1987-icc.jpg`: Mapa topogràfic de Catalunya 1:5.000, full 287-122
-  «Sant Cugat del Vallès», Institut Cartogràfic de Catalunya (vol de 1987,
-  edició de 1994), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ca),
-  retallat i ajustat a les coordenades actuals.
 - `vendor/leaflet/`: Leaflet 1.9.4, llicència BSD-2-Clause (vegeu
   `vendor/leaflet/LICENSE`).

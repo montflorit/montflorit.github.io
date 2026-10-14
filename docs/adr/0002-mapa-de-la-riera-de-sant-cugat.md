@@ -48,8 +48,29 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
     cubiertos unos 1,5 km (riera de Can Mòra, torrent de Saladrigues y riera de
     Sant Cugat); hay además dos tramos cubiertos en la cabecera (138 m del
     torrent de Can Cortès y 149 m de la riera de Can Vilallonga).
-  - El mapa de 1987 y las ortofotos antiguas se quedan como fondos: enseñan el
-    cauce de antes de cubrirlo.
+  - Las ortofotos antiguas se quedan como fondos: enseñan el cauce de antes de
+    cubrirlo.
+- **Tramo cubierto de Sant Cugat: la capa «Rieres i torrents» del Ajuntament**
+  (cambio del 14-10-2026, aprobado por Juanjo: «sí, aplícalo todo»). Juanjo
+  pidió investigar el alcantarillado porque la ACA y el ICGC no coincidían. El
+  Geoportal municipal (`geociutat.santcugat.cat`) publica como GeoJSON abierto
+  `ma_rieres_torrents` (con el tipo «Curs Fluvial Principal Soterrat») y la red
+  de pluviales `clav_pluvials_xarxa` (con la sección de cada tubo).
+  - El soterrado municipal (torrent de Can Trabal, que aquí se rotula riera de
+    Can Mòra, y riera de Sant Cugat; 1,7 km) va sobre los colectores grandes:
+    el 82 % a menos de 15 m de uno de 1,5 m o más (secciones de 2,5 m, 3×2 m y
+    5×2 m); el del ICGC, el 40 %.
+  - Coincide con el trazado que Juanjo corrigió a mano sobre las ortofotos
+    (mediana 2 m, máximo 11 m): la riera se cubrió por su lecho de siempre.
+    Sustituirlo por el del ICGC fue un error; la línea de puntos del ICGC en el
+    centro es otro conducto, de colectores menores.
+  - La red de la ACA es esquemática (1:50.000, de 2000): queda a 26 m de mediana
+    del soterrado municipal. El texto del mapa lo dice así.
+  - Licencia: la capa figura como pública en el Geoportal, sin licencia
+    indicada; se cita como fuente.
+- **Fuera la capa del mapa de 1987** (Juanjo: «quita la capa de 1987»): solo
+  cubría el centro de Sant Cugat y las ortofotos antiguas ya enseñan el curso
+  de antes; pesaba 1 MB.
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa

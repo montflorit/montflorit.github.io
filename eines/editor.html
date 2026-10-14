@@ -33,8 +33,7 @@ const topo=L.tileLayer('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/w
 const f7077=wmsH('ortofoto_blanc_i_negre_1970-1977','1970-1977').addTo(map);
 const bases={'Ortofoto 1970-1977 (ICGC)':f7077,'Ortofoto 1956 (ICGC)':wmsH('ortofoto_blanc_i_negre_1956-1957','1956'),'Ortofoto 1946 (ICGC)':wmsH('ortofoto_blanc_i_negre_1945-1946','1946'),
  'Ortofoto actual (ICGC)':L.tileLayer('https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.jpeg',{maxZoom:21,maxNativeZoom:19,attribution:'Ortofoto: ICGC'}),'Topográfico actual (ICGC)':topo,'Callejero (ICGC)':L.tileLayer('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/estandard/MON3857NW/{z}/{x}/{y}.png',{maxZoom:21,maxNativeZoom:19,attribution:'Mapa: ICGC'})};
-const m1987=L.imageOverlay('/img/mapa-1987-icc.jpg',[[41.4650,2.0780],[41.4735,2.0940]],{opacity:0.5,attribution:'Mapa topogràfic 1:5.000, 1987: ICC (CC BY 4.0)'});
-L.control.layers(bases,{'Mapa 1:5.000 de 1987 (centro de Sant Cugat)':m1987},{collapsed:false,position:'topright'}).addTo(map);
+L.control.layers(bases,{},{collapsed:false,position:'topright'}).addTo(map);
 
 const colAlto='#e8590c', colRiera='#1864ab';
 function estilo(p){
@@ -42,7 +41,7 @@ function estilo(p){
   if(p.estat!=='cobert') return {color:col,weight:5,dashArray:null};
   return {color:col,weight:5,dashArray:'8 6'};
 }
-const FONTS={icgc:'Base topográfica 1:5.000 del ICGC',osm:'OpenStreetMap'};
+const FONTS={icgc:'Base topográfica 1:5.000 del ICGC',santcugat:'Ajuntament de Sant Cugat (Rieres i torrents)',osm:'OpenStreetMap'};
 let grupo=L.featureGroup().addTo(map), sinGuardar=false, historial=[], actual=null, seleccion=null;
 
 function cargar(gj,encuadrar){
@@ -128,12 +127,11 @@ panel.onAdd=()=>{const d=L.DomUtil.create('div','panel');d.innerHTML=`<h1>Editor
 <div class="fila"><button class="principal" onclick="guardar()" title="Guarda el trazado y actualiza el mapa de consulta (Ctrl+S)">Guardar</button>
 <button id="deshacer" onclick="deshacer()" disabled title="Deshace el último cambio (Ctrl+Z)">Deshacer</button></div>
 <div id="estado">Sin cambios</div>
-<div class="fila" title="Transparencia del mapa de 1987 cuando está activado"><span>Mapa 1987</span><input type="range" min="0" max="100" value="50" oninput="m1987.setOpacity(this.value/100)"></div>
 <div id="ficha">
  <label>Nombre (vacío si no tiene)</label><input type="text" id="f-nombre">
  <label>Parte del recorrido</label><select id="f-tramo"><option value="capcalera">Cabecera (naranja)</option><option value="sant-cugat">Paso por Sant Cugat (azul)</option><option value="riera">Riera de Sant Cugat (azul)</option></select>
  <label>Estado</label><select id="f-estado"><option value="obert">A cielo abierto (línea continua)</option><option value="cobert">Cubierta (línea discontinua)</option></select>
- <label>Fuente</label><select id="f-fuente"><option value="icgc">Base topográfica 1:5.000 del ICGC</option><option value="osm">OpenStreetMap</option></select>
+ <label>Fuente</label><select id="f-fuente"><option value="icgc">Base topográfica 1:5.000 del ICGC</option><option value="santcugat">Ajuntament de Sant Cugat (Rieres i torrents)</option><option value="osm">OpenStreetMap</option></select>
  <div class="fila"><button onclick="aplicaFicha()">Aplicar</button><button onclick="ocultarFicha()">Cerrar</button></div>
 </div>
 <details><summary>Cómo se usa</summary><ul>

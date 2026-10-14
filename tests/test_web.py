@@ -106,7 +106,7 @@ def test_tracat_valid():
         assert f["geometry"]["type"] == "LineString" and len(f["geometry"]["coordinates"]) >= 2
         assert p["part"] in ("capcalera", "sant-cugat", "riera")
         assert p["estat"] in ("obert", "cobert")
-        assert p["font"] in ("icgc", "osm")
+        assert p["font"] in ("icgc", "santcugat", "osm")
         for lon, lat in f["geometry"]["coordinates"]:
             assert 2.05 < lon < 2.20 and 41.40 < lat < 41.50, "coordenada fora de la zona"
 
