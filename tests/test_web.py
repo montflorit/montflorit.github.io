@@ -74,7 +74,7 @@ def test_enllacos_externs_en_pestanya_nova():
 
 def test_mateixos_enllacos_externs_en_les_dues_llengues():
     """Cada font enllaçada en català també ho està en castellà (pot canviar la variant de la llengua)."""
-    normalitza = lambda u: re.sub(r"(deed\.ca|deed\.es|copyright/ca|copyright/es|Geoinformacio.*|Geoinformacion.*|dadespersonals|datospersonales)", "",
+    normalitza = lambda u: re.sub(r"(deed\.ca|deed\.es|copyright/ca|copyright/es|Geoinformacio.*|Geoinformacion.*|dadespersonals|datospersonales|Ajuda/Avis-legal|Ayuda/Aviso-legal)", "",
                                   re.sub(r"/(ca|es)/", "/", u))
     for pagina in PAGINES:
         ca = {normalitza(u) for e, u, a in analitza(pagina).enllacos if e == "a" and u.startswith("http")}
@@ -106,7 +106,7 @@ def test_tracat_valid():
         assert f["geometry"]["type"] == "LineString" and len(f["geometry"]["coordinates"]) >= 2
         assert p["part"] in ("capcalera", "sant-cugat", "riera")
         assert p["estat"] in ("obert", "cobert")
-        assert p["font"] in ("osm", "icc-1987", "reconstruccio")
+        assert p["font"] in ("icgc", "osm")
         for lon, lat in f["geometry"]["coordinates"]:
             assert 2.05 < lon < 2.20 and 41.40 < lat < 41.50, "coordenada fora de la zona"
 

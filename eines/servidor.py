@@ -30,7 +30,7 @@ def valida(gj):
         p = f["properties"]
         assert p.get("part") in ("capcalera", "sant-cugat", "riera"), f"part desconeguda: {p.get('part')}"
         assert p.get("estat") in ("obert", "cobert"), f"estat desconegut: {p.get('estat')}"
-        assert p.get("font") in ("osm", "icc-1987", "reconstruccio"), f"font desconeguda: {p.get('font')}"
+        assert p.get("font") in ("icgc", "osm"), f"font desconeguda: {p.get('font')}"
 
 
 class Gestor(SimpleHTTPRequestHandler):

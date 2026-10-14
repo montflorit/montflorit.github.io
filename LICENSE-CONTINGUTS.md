@@ -10,11 +10,12 @@ El codi està sota la llicència AGPL-3.0-or-later: vegeu [LICENSE](LICENSE).
 
 ## Dades i materials de tercers
 
-- `dades/riera-sant-cugat.geojson`: deriva d'OpenStreetMap, i per això està
-  sota la [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/).
-  © col·laboradors d'OpenStreetMap. El tram cobert de Sant Cugat s'ha traçat
-  sobre el Mapa topogràfic de Catalunya 1:5.000 de l'ICC (CC BY 4.0) i les
-  ortofotos de l'ICGC.
+- `dades/riera-sant-cugat.geojson`: la xarxa hidrogràfica de la base
+  topogràfica 1:5.000 de l'Institut Cartogràfic i Geològic de Catalunya
+  (reutilitzable citant-ne la font, segons el seu avís legal), amb dos trams
+  curts d'OpenStreetMap; per aquests, el conjunt està sota la
+  [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/).
+  © col·laboradors d'OpenStreetMap.
 - `dades/montflorit-limits.geojson`: els límits del barri de Temps a
   Montflorit (`meteo-montflorit/meteo-local`), amb les fonts que s'hi
   expliquen.

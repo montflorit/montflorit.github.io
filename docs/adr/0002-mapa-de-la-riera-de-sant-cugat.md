@@ -15,29 +15,41 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   dice que está seca. El agua sigue, según OpenStreetMap, por un torrente sin
   nombre, el torrent de Can Cortès y las rieras de Can Vilallonga y de Can
   Trabal.
-- **Tramos a cielo abierto: OpenStreetMap.** Seguidos aguas abajo con la API
-  de OpenStreetMap (vía a vía, por el sentido del cauce). Contrastados con el
-  mapa 1:5.000 de 1987 en lo que cubre la hoja: la riera de Can Trabal se
-  aparta 14 m de mediana (31 m como máximo) y la riera desde la Pollancreda,
-  23 m (27 m).
-- **Tramo cubierto de Sant Cugat** (unos 1,7 km), en dos partes:
-  - Desde la Rambla del Celler hasta la Pollancreda: el cauce del *Mapa
-    topogràfic de Catalunya 1:5.000*, hoja 287-122 «Sant Cugat del Vallès»
-    (ICC, vuelo de mayo de 1987, CC BY 4.0, Cartoteca Digital del ICGC),
-    cuando aún iba abierto. La hoja se ajustó a las coordenadas actuales
-    pasando de ED50 a WGS84 con un cambio de datum de tres parámetros
-    (−87, −98, −121 m); comprobado superponiéndola a la ortofoto de 1970-1977,
-    donde coinciden la curva de la rambla y las calles.
-  - Desde el golf hasta la Rambla del Celler, donde en 1987 ya estaba
-    cubierto: **reconstruido** sobre la ortofoto de 1970-1977 del ICGC, donde
-    aún se ve el cauce con vegetación, y las cotas de la hoja de 1987, que
-    bajan sobre ese recorrido (122, 119,3, 116,9, 116,2 y 114,4 m). Pasa a
-    unos 30 m del pollancre de «l'antiga riera de Can Mora» del inventario de
-    la Diputació (ficha 08205-761). Juanjo corrigió a mano el trazado sobre
-    las ortofotos con el editor (ADR 0003). Se marca como aproximado.
-  - Descartado: el eje de la Base topogràfica 1:5.000 del ICGC para tramos
-    cubiertos. Es esquemático; Juanjo vio en la ortofoto que no coincidía con
-    el recorrido real.
+- **Trazado: la red hidrográfica de la base topográfica 1:5.000 del ICGC**
+  (cambio del 14-10-2026). Se lee de las teselas vectoriales del mapa estándar
+  del ICGC (`mapa-base2/vt`, nivel 15, capa `waterway`, atributo
+  `escala: 5m`), que traen el nombre de cada tramo y si va cubierto
+  (`brunnel: tunnel`). El recorrido se sigue de la font del Rabassalet al
+  Ripoll por el camino más corto de esa red; los trozos que la tesela corta se
+  sueldan a menos de 1 m y los extremos sueltos se unen a menos de 25 m.
+  Nombres del ICGC: torrent de Can Cortès, rieras de Can Bova, de Can
+  Vilallonga, de Can Trabal y de Can Mòra, torrent de Saladrigues y riera de
+  Sant Cugat.
+  - Motivo (Juanjo): bajo Sant Cugat, la línea de puntos del callejero del
+    ICGC «no coincide exactamente con la nuestra, parece que en algunos sitios
+    debe haber sido desviada al ser soterrada»; y fuera de Sant Cugat, «el
+    recorrido actual se ve como una mala aproximación». Comprobado sobre la
+    ortofoto actual: la red del ICGC sigue los meandros del cauce; la de
+    OpenStreetMap lo simplifica en rectas (hasta 36 m de diferencia en la riera
+    de Can Bova).
+  - Sustituye el trazado anterior: OpenStreetMap en los tramos abiertos y, bajo
+    Sant Cugat, el cauce antiguo del mapa 1:5.000 de 1987 y una reconstrucción
+    sobre las ortofotos de 1970-1977, corregida a mano por Juanjo. Aquello era
+    el curso de antes de cubrirla; lo de ahora es el curso actual de la riera
+    cubierta, que en algunos tramos se desvió (se aparta hasta 120 m del
+    antiguo, en el paso por el torrent de Saladrigues). Antes se había probado
+    el eje de la capa WMS `170_hidrografia_connexions_l`, que es esquemático;
+    los datos vectoriales son los que dibuja el callejero.
+  - **Dos huecos** de la red del ICGC, con OpenStreetMap: unos 570 m en
+    Cerdanyola (entre las longitudes 2,143 y 2,149) y los últimos 128 m hasta
+    el Ripoll. Por ellos el archivo es ODbL.
+  - **Cubierta**: los tramos `tunnel` de 60 m o más. Los más cortos son pasos
+    bajo un camino o una carretera y se dibujan abiertos. Bajo Sant Cugat van
+    cubiertos unos 1,5 km (riera de Can Mòra, torrent de Saladrigues y riera de
+    Sant Cugat); hay además dos tramos cubiertos en la cabecera (138 m del
+    torrent de Can Cortès y 149 m de la riera de Can Vilallonga).
+  - El mapa de 1987 y las ortofotos antiguas se quedan como fondos: enseñan el
+    cauce de antes de cubrirlo.
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa
@@ -66,8 +78,10 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
 
 ## Riesgos
 
-- El tramo reconstruido es aproximado: solo lo confirmarían los proyectos de
-  las obras de cobertura, en el Arxiu Municipal de Sant Cugat.
+- El curso cubierto es el que dibuja el ICGC; los proyectos de las obras de
+  cobertura, en el Arxiu Municipal de Sant Cugat, lo confirmarían.
+- Si el ICGC cambia sus teselas vectoriales, el trazado guardado no cambia:
+  hay que volver a extraerlo a mano.
 - Si OpenStreetMap o el ICGC cambian sus servicios, un fondo dejaría de verse;
   el trazado se sigue viendo con los demás.
 - El servidor de teselas de OpenStreetMap admite un uso ligero como este, sin

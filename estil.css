@@ -191,8 +191,7 @@ body.sense-desplacament { overflow: hidden; }
 .llegenda i { display: inline-block; width: 2rem; height: 0; border-top: 4px solid; flex: none; }
 .llegenda .capcalera { border-color: var(--capcalera); }
 .llegenda .riera { border-color: var(--riera); }
-.llegenda .cobert-1987 { border-color: var(--riera); border-top-style: dashed; }
-.llegenda .cobert-aprox { border-color: var(--riera); border-top-style: dotted; }
+.llegenda .cobert { border-color: var(--riera); border-top-style: dashed; }
 .llegenda .barri { border-color: var(--barri); border-top-style: dashed; }
 .ajuda-mapa { margin: .4rem 0 0; color: var(--suau); font-size: .9rem; }
 

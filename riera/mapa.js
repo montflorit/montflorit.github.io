@@ -13,7 +13,7 @@ const TEXTOS = {
     osm: 'Mapa: © <a href="https://www.openstreetmap.org/copyright/ca" target="_blank" rel="noopener">col·laboradors d\'OpenStreetMap</a>',
     icgc: 'Mapa: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis" target="_blank" rel="noopener">Institut Cartogràfic i Geològic de Catalunya</a>',
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-Ortoimatges/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
-    tracat: 'Traçat: OpenStreetMap, ICC i ICGC (<a href="../fonts.html">fonts</a>)',
+    tracat: 'Traçat: ICGC i OpenStreetMap (<a href="../fonts.html">fonts</a>)',
     fons: {
       osm: 'OpenStreetMap', carrers: 'Carrers (ICGC)', topo: 'Topogràfic (ICGC)', orto: 'Ortofoto actual (ICGC)',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
@@ -22,9 +22,8 @@ const TEXTOS = {
     senseNom: 'Torrent sense nom',
     cobert: 'coberta',
     font: {
-      osm: 'Traçat d\'OpenStreetMap.',
-      'icc-1987': 'Traçat del mapa topogràfic 1:5.000 de 1987 (ICC), quan encara anava a cel obert, ajustat a les ortofotos antigues.',
-      reconstruccio: 'Traçat aproximat: reconstruït sobre les ortofotos de 1970-1977 (ICGC), on encara es veu la riera, i les cotes del mapa de 1987.',
+      icgc: 'Traçat de la base topogràfica 1:5.000 de l\'ICGC.',
+      osm: 'Traçat d\'OpenStreetMap: aquí la base de l\'ICGC té un buit.',
     },
     barri: 'Montflorit (els límits de Temps a Montflorit)',
     rabassalet: 'Font del Rabassalet: aquí neix la riera segons la Gran Enciclopèdia Catalana. Seca, segons la fitxa de la Diputació revisada el 2025.',
@@ -52,7 +51,7 @@ const TEXTOS = {
     osm: 'Mapa: © <a href="https://www.openstreetmap.org/copyright/es" target="_blank" rel="noopener">colaboradores de OpenStreetMap</a>',
     icgc: 'Mapa: <a href="https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios" target="_blank" rel="noopener">Institut Cartogràfic i Geològic de Catalunya</a>',
     ortoAny: (any) => `Ortofoto ${any}: <a href="https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios/WMS-Ortoimagenes/WMS-Ortofoto-Territorial" target="_blank" rel="noopener">ICGC</a>`,
-    tracat: 'Trazado: OpenStreetMap, ICC e ICGC (<a href="../fonts.html">fuentes</a>)',
+    tracat: 'Trazado: ICGC y OpenStreetMap (<a href="../fonts.html">fuentes</a>)',
     fons: {
       osm: 'OpenStreetMap', carrers: 'Calles (ICGC)', topo: 'Topográfico (ICGC)', orto: 'Ortofoto actual (ICGC)',
       o46: 'Ortofoto de 1946 (ICGC)', o56: 'Ortofoto de 1956 (ICGC)', o77: 'Ortofoto de 1970-1977 (ICGC)',
@@ -61,9 +60,8 @@ const TEXTOS = {
     senseNom: 'Torrente sin nombre',
     cobert: 'cubierta',
     font: {
-      osm: 'Trazado de OpenStreetMap.',
-      'icc-1987': 'Trazado del mapa topográfico 1:5.000 de 1987 (ICC), cuando aún iba a cielo abierto, ajustado a las ortofotos antiguas.',
-      reconstruccio: 'Trazado aproximado: reconstruido sobre las ortofotos de 1970-1977 (ICGC), donde aún se ve la riera, y las cotas del mapa de 1987.',
+      icgc: 'Trazado de la base topográfica 1:5.000 del ICGC.',
+      osm: 'Trazado de OpenStreetMap: aquí la base del ICGC tiene un hueco.',
     },
     barri: 'Montflorit (los límites de Temps a Montflorit)',
     rabassalet: 'Font del Rabassalet: aquí nace la riera según la Gran Enciclopèdia Catalana. Seca, según la ficha de la Diputació revisada en 2025.',
@@ -136,9 +134,8 @@ const mapa1987 = L.imageOverlay(ARREL + 'img/mapa-1987-icc.jpg', [[41.4650, 2.07
 // --- Estil de cada tram ---
 function estilTram(p) {
   const c = color(p.part === 'capcalera' ? '--capcalera' : '--riera');
-  if (p.estat !== 'cobert') return { color: c, weight: 5, dashArray: null };
-  // Cobert: ratlles llargues on segueix el mapa de 1987; punts on és aproximat.
-  return { color: c, weight: 5, dashArray: p.font === 'reconstruccio' ? '2 7' : '8 6' };
+  // Coberta (per sota terra): ratllada.
+  return { color: c, weight: 5, dashArray: p.estat === 'cobert' ? '8 6' : null };
 }
 
 function textTram(p) {

@@ -40,9 +40,9 @@ const colAlto='#e8590c', colRiera='#1864ab';
 function estilo(p){
   const col=p.part==='capcalera'?colAlto:colRiera;
   if(p.estat!=='cobert') return {color:col,weight:5,dashArray:null};
-  return {color:col,weight:5,dashArray:p.font==='reconstruccio'?'2 7':'8 6'};
+  return {color:col,weight:5,dashArray:'8 6'};
 }
-const FONTS={osm:'OpenStreetMap','icc-1987':'Mapa de 1987 (ICC) y ortofotos',reconstruccio:'Reconstruido sobre las ortofotos (aproximado)'};
+const FONTS={icgc:'Base topográfica 1:5.000 del ICGC',osm:'OpenStreetMap'};
 let grupo=L.featureGroup().addTo(map), sinGuardar=false, historial=[], actual=null, seleccion=null;
 
 function cargar(gj,encuadrar){
@@ -94,7 +94,7 @@ function muestraFicha(l){
   document.getElementById('f-nombre').value=p.nom||'';
   document.getElementById('f-tramo').value=p.part||'sant-cugat';
   document.getElementById('f-estado').value=p.estat||'obert';
-  document.getElementById('f-fuente').value=p.font||'osm';
+  document.getElementById('f-fuente').value=p.font||'icgc';
 }
 function ocultarFicha(){ document.getElementById('ficha').style.display='none'; if(seleccion) seleccion.setStyle({weight:5}); seleccion=null; }
 function aplicaFicha(){
@@ -110,10 +110,10 @@ function aplicaFicha(){
 map.pm.setLang('es');
 map.pm.addControls({position:'topleft',drawMarker:false,drawCircleMarker:false,drawPolygon:false,drawRectangle:false,drawCircle:false,drawText:false,
   cutPolygon:false,rotateMode:false,dragMode:false,editMode:true,drawPolyline:true,removalMode:true});
-map.pm.setGlobalOptions({snappable:true,snapDistance:15,removeVertexOn:'contextmenu',pathOptions:estilo({part:'sant-cugat',estat:'cobert',font:'reconstruccio'})});
+map.pm.setGlobalOptions({snappable:true,snapDistance:15,removeVertexOn:'contextmenu',pathOptions:estilo({part:'sant-cugat',estat:'cobert',font:'icgc'})});
 map.on('pm:create',e=>{
   const l=e.layer; grupo.addLayer(l);
-  prepara(l,{nom:'Riera de Sant Cugat',part:'sant-cugat',estat:'cobert',font:'reconstruccio'});
+  prepara(l,{nom:'Riera de Sant Cugat',part:'sant-cugat',estat:'cobert',font:'icgc'});
   l.setStyle(estilo(l.feature.properties)); cambio(); muestraFicha(l);
 });
 map.on('pm:remove',e=>{ grupo.removeLayer(e.layer); if(seleccion===e.layer) ocultarFicha(); cambio(); });
@@ -133,7 +133,7 @@ panel.onAdd=()=>{const d=L.DomUtil.create('div','panel');d.innerHTML=`<h1>Editor
  <label>Nombre (vacío si no tiene)</label><input type="text" id="f-nombre">
  <label>Parte del recorrido</label><select id="f-tramo"><option value="capcalera">Cabecera (naranja)</option><option value="sant-cugat">Paso por Sant Cugat (azul)</option><option value="riera">Riera de Sant Cugat (azul)</option></select>
  <label>Estado</label><select id="f-estado"><option value="obert">A cielo abierto (línea continua)</option><option value="cobert">Cubierta (línea discontinua)</option></select>
- <label>Fuente</label><select id="f-fuente"><option value="osm">OpenStreetMap</option><option value="icc-1987">Mapa de 1987 (ICC) y ortofotos</option><option value="reconstruccio">Reconstruido sobre las ortofotos (aproximado)</option></select>
+ <label>Fuente</label><select id="f-fuente"><option value="icgc">Base topográfica 1:5.000 del ICGC</option><option value="osm">OpenStreetMap</option></select>
  <div class="fila"><button onclick="aplicaFicha()">Aplicar</button><button onclick="ocultarFicha()">Cerrar</button></div>
 </div>
 <details><summary>Cómo se usa</summary><ul>
