@@ -126,6 +126,17 @@ def pagina(nom, llengua):
   <link rel="alternate" hreflang="es" href="{url_es}">
   <link rel="icon" href="{ICONA}">
   <script>
+    // L'idioma triat amb el selector (tema.js el desa): si no és el d'aquesta pàgina,
+    // la mateixa pàgina en l'altre, abans de pintar res (Juanjo, 14-10-2026: «el
+    // idioma de la web debe ser persistente»). Sense triar, cada pàgina en el seu.
+    try {{
+      const llengua = localStorage.getItem('montflorit.idioma');
+      const altra = llengua && llengua !== document.documentElement.lang
+        && document.querySelector(`link[rel="alternate"][hreflang="${{llengua}}"]`);
+      if (altra) location.replace(new URL(altra.href).pathname + location.search + location.hash);
+    }} catch (_) {{}}
+  </script>
+  <script>
     // El tema abans de pintar res, per no fer un parpelleig.
     try {{
       const triat = localStorage.getItem('montflorit.fosc');

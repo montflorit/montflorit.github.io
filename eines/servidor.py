@@ -28,7 +28,7 @@ def valida(gj):
     for f in gj["features"]:
         assert f["geometry"]["type"] == "LineString", "cada tram ha de ser una línia"
         p = f["properties"]
-        assert p.get("part") in ("capcalera", "sant-cugat", "riera", "afluent"), f"part desconeguda: {p.get('part')}"
+        assert p.get("part") in ("capcalera", "sant-cugat", "riera", "afluent", "afluent-riera"), f"part desconeguda: {p.get('part')}"
         assert p.get("estat") in ("obert", "cobert"), f"estat desconegut: {p.get('estat')}"
         assert p.get("font") in ("icgc", "santcugat", "osm"), f"font desconeguda: {p.get('font')}"
 
@@ -54,7 +54,7 @@ class Gestor(SimpleHTTPRequestHandler):
                 f["geometry"]["coordinates"] = [[round(x, 6), round(y, 6)] for x, y in f["geometry"]["coordinates"]]
             provisional = TRACAT + ".tmp"
             with open(provisional, "w", encoding="utf-8") as fitxer:
-                json.dump(gj, fitxer, ensure_ascii=False, indent=1)
+                json.dump(gj, fitxer, ensure_ascii=False, separators=(",", ":"))
             os.replace(provisional, TRACAT)
             resposta, codi = {"ok": True, "hora": time.strftime("%H:%M:%S")}, 200
         except Exception as error:

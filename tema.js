@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// El commutador de tema clar o fosc, el mateix de Temps a Montflorit.
+// El commutador de tema clar o fosc, el mateix de Temps a Montflorit, i el record de l'idioma.
 // Sense triar res, la web segueix el tema del sistema; si es tria l'altre,
 // es desa només al dispositiu (montflorit.fosc) i no s'envia enlloc.
 
@@ -35,4 +35,12 @@ botoTema.addEventListener('click', () => {
 });
 sistemaFosc.addEventListener('change', (e) => {
   if (segueixSistema()) aplicaFosc(e.matches, false);
+});
+
+// L'idioma que es tria al selector es desa al dispositiu (montflorit.idioma) i les
+// pàgines s'obren en aquest idioma (vegeu l'script de la capçalera).
+document.querySelectorAll('.idiomes a[hreflang]').forEach((enllac) => {
+  enllac.addEventListener('click', () => {
+    try { localStorage.setItem('montflorit.idioma', enllac.getAttribute('hreflang')); } catch (_) {}
+  });
 });

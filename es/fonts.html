@@ -12,6 +12,17 @@
   <link rel="alternate" hreflang="es" href="https://montflorit.github.io/es/fonts.html">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z'/%3E%3C/svg%3E">
   <script>
+    // L'idioma triat amb el selector (tema.js el desa): si no és el d'aquesta pàgina,
+    // la mateixa pàgina en l'altre, abans de pintar res (Juanjo, 14-10-2026: «el
+    // idioma de la web debe ser persistente»). Sense triar, cada pàgina en el seu.
+    try {
+      const llengua = localStorage.getItem('montflorit.idioma');
+      const altra = llengua && llengua !== document.documentElement.lang
+        && document.querySelector(`link[rel="alternate"][hreflang="${llengua}"]`);
+      if (altra) location.replace(new URL(altra.href).pathname + location.search + location.hash);
+    } catch (_) {}
+  </script>
+  <script>
     // El tema abans de pintar res, per no fer un parpelleig.
     try {
       const triat = localStorage.getItem('montflorit.fosc');
@@ -77,7 +88,7 @@
   </main>
 
   <footer class="peu">
-    <p><a href="https://github.com/montflorit/montflorit.github.io/releases" target="_blank" rel="noopener">versión 1.1.0</a> · <a href="../fonts.html">Fuentes y créditos</a> · <a href="../privacitat.html">Privacidad</a></p>
+    <p><a href="https://github.com/montflorit/montflorit.github.io/releases" target="_blank" rel="noopener">versión 1.2.0</a> · <a href="../fonts.html">Fuentes y créditos</a> · <a href="../privacitat.html">Privacidad</a></p>
     <p>© 2026 <a href="https://bilateria.org" target="_blank" rel="noopener">Juan José de Haro</a> · Contenidos <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener">CC BY-SA 4.0</a> · Código <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3</a> · Web vecinal, no oficial</p>
     <p>Hecho con IA (Claude Code, octubre de 2026), <a href="https://jjdeharo.github.io/miae/?nivel=4" target="_blank" rel="noopener">nivel 4 del MIAE</a>.</p>
   </footer>

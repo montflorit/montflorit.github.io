@@ -104,7 +104,7 @@ def test_tracat_valid():
     for f in gj["features"]:
         p = f["properties"]
         assert f["geometry"]["type"] == "LineString" and len(f["geometry"]["coordinates"]) >= 2
-        assert p["part"] in ("capcalera", "sant-cugat", "riera", "afluent")
+        assert p["part"] in ("capcalera", "sant-cugat", "riera", "afluent", "afluent-riera")
         assert p["estat"] in ("obert", "cobert")
         assert p["font"] in ("icgc", "santcugat", "osm")
         for lon, lat in f["geometry"]["coordinates"]:
@@ -113,7 +113,7 @@ def test_tracat_valid():
 
 def test_tracat_continu():
     """Cada tram comença on acaba l'anterior (menys d'1 m), de la font al Ripoll; i l'afluent, igual fins a la riera."""
-    trams = [f for f in json.loads(llegeix("dades/riera-sant-cugat.geojson"))["features"] if f["properties"]["part"] != "afluent"]
+    trams = [f for f in json.loads(llegeix("dades/riera-sant-cugat.geojson"))["features"] if not f["properties"]["part"].startswith("afluent")]
     for anterior, seguent in zip(trams, trams[1:]):
         (x1, y1), (x2, y2) = anterior["geometry"]["coordinates"][-1], seguent["geometry"]["coordinates"][0]
         metres = ((x1 - x2) * 83500) ** 2 + ((y1 - y2) * 111000) ** 2
@@ -121,14 +121,23 @@ def test_tracat_continu():
 
 
 def test_afluents_connectats_a_la_riera():
-    """Cada tram dels afluents acaba a sobre d'un altre tram d'afluent o de la riera (menys d'1 m)."""
+    """Cada tram d'afluent acaba a sobre d'un altre curs (menys d'1 m): cap afluent queda solt."""
     totes = json.loads(llegeix("dades/riera-sant-cugat.geojson"))["features"]
-    afl = [f["geometry"]["coordinates"] for f in totes if f["properties"]["part"] == "afluent"]
-    riera = [p for f in totes if f["properties"]["part"] == "riera" for p in f["geometry"]["coordinates"]]
-    metres = lambda a, b: (((a[0] - b[0]) * 83500) ** 2 + ((a[1] - b[1]) * 111000) ** 2) ** 0.5
-    for n, tram in enumerate(afl):
-        altres = riera + [p for m, t in enumerate(afl) if m != n for p in t]
-        assert min(metres(tram[-1], p) for p in altres) < 1, f"tram {n} de l'afluent sense continuació"
+    linies = [f["geometry"]["coordinates"] for f in totes]
+
+    def dist_segment(p, a, b):
+        ax, ay = (a[0] - p[0]) * 83500, (a[1] - p[1]) * 111000
+        bx, by = (b[0] - p[0]) * 83500, (b[1] - p[1]) * 111000
+        dx, dy = bx - ax, by - ay
+        t = max(0, min(1, -(ax * dx + ay * dy) / ((dx * dx + dy * dy) or 1)))
+        return ((ax + t * dx) ** 2 + (ay + t * dy) ** 2) ** 0.5
+
+    for n, f in enumerate(totes):
+        if not f["properties"]["part"].startswith("afluent"):
+            continue
+        fi = f["geometry"]["coordinates"][-1]
+        d = min(dist_segment(fi, a, b) for m, l in enumerate(linies) if m != n for a, b in zip(l, l[1:]))
+        assert d < 1, f"{f['properties']['nom']}: el tram {n} no s'uneix a cap curs ({d:.1f} m)"
 
 
 def test_limits_iguals_que_temps_a_montflorit():

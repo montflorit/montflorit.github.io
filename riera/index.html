@@ -12,6 +12,17 @@
   <link rel="alternate" hreflang="es" href="https://montflorit.github.io/es/riera/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z'/%3E%3C/svg%3E">
   <script>
+    // L'idioma triat amb el selector (tema.js el desa): si no és el d'aquesta pàgina,
+    // la mateixa pàgina en l'altre, abans de pintar res (Juanjo, 14-10-2026: «el
+    // idioma de la web debe ser persistente»). Sense triar, cada pàgina en el seu.
+    try {
+      const llengua = localStorage.getItem('montflorit.idioma');
+      const altra = llengua && llengua !== document.documentElement.lang
+        && document.querySelector(`link[rel="alternate"][hreflang="${llengua}"]`);
+      if (altra) location.replace(new URL(altra.href).pathname + location.search + location.hash);
+    } catch (_) {}
+  </script>
+  <script>
     // El tema abans de pintar res, per no fer un parpelleig.
     try {
       const triat = localStorage.getItem('montflorit.fosc');
@@ -51,6 +62,7 @@
       <li><i class="riera" aria-hidden="true"></i>Riera de Sant Cugat</li>
       <li><i class="cobert" aria-hidden="true"></i>Coberta, per sota terra</li>
       <li><i class="afluent" aria-hidden="true"></i>Torrent dels Gorgs i afluents</li>
+      <li><i class="afluent2" aria-hidden="true"></i>Altres afluents de la riera (capa opcional)</li>
       <li><i class="barri" aria-hidden="true"></i>Montflorit</li>
     </ul>
     <p class="ajuda-mapa" id="llegenda-inundable" hidden><strong>Profunditat de l'aigua</strong> a les zones inundables de l'ACA: <span class="prof p1"></span>fins a 0,4&nbsp;m <span class="prof p2"></span>0,4-1&nbsp;m <span class="prof p3"></span>1-3,5&nbsp;m <span class="prof p4"></span>3,5-6&nbsp;m <span class="prof p5"></span>més de 6&nbsp;m. «Cada 10 anys» vol dir una avinguda que, de mitjana, arriba una vegada cada 10 anys; com més anys, més rara i més gran. Font: <a href="https://aca.gencat.cat/ca/laigua/proteccio-i-conservacio/gestio-de-la-inundabilitat/" target="_blank" rel="noopener">Agència Catalana de l'Aigua</a>.</p>
@@ -62,6 +74,7 @@
       <li><strong>Capçalera.</strong> L'aigua baixa pel torrent de Can Cortès i per les rieres de Can Bova, de Can Vilallonga i de Can Trabal, i passa per la Colònia Duran i pel costat del camp de golf.</li>
       <li><strong>Sant Cugat.</strong> Hi entra com a riera de Can Mòra i va coberta fins al parc de la Pollancreda, uns 1,7&nbsp;km. Es va cobrir a trams: el 1978, el 1981 i a partir del 1995, segons la <a href="https://www.santcugat.cat/nomenclator/rambla-del-celler" target="_blank" rel="noopener">història de la Rambla del Celler de l'Ajuntament</a>. Un <a href="https://patrimonicultural.diba.cat/node/95928" target="_blank" rel="noopener">pollancre catalogat</a> en recorda l'antic curs.</li>
       <li><strong>El torrent dels Gorgs.</strong> Neix a Bellaterra, al costat de la via del tren i del campus de la UAB, com a torrent de Can Miró; baixa com a torrent de Can Magrans i desemboca a la riera a Montflorit com a torrent dels Gorgs. En total, uns 4,6&nbsp;km. A la vall de Moronta hi arriba el torrent de Can Domènec, que neix a Bellaterra, a tocar del Camí Antic de Sant Cugat, i passa per sota de la via del tren: uns 3,4&nbsp;km. A Bellaterra, el seu tram alt és conegut com a torrent de la Bonaigua. Al campus també hi arriba un torrent sense nom que neix a tocar de la plaça del Pi.</li>
+      <li><strong>Altres afluents.</strong> Al selector de capes es poden veure els altres 42 torrents i rieres amb nom de la conca, amb els seus afluents, de la base de l'ICGC: els principals que arriben a la riera són el torrent de Sant Iscle, la riera de Volpelleres, el torrent de Can Fatjó, el del Sant Crist (amb la riera de Sant Medir), el de Can Codonyers i el de Saladrigues.</li>
       <li><strong>Cerdanyola i Montcada.</strong> Des de la Pollancreda, ja com a riera de Sant Cugat, passa per Montflorit i desemboca al Ripoll a Montcada i Reixac.</li>
     </ul>
 
@@ -70,7 +83,7 @@
   </main>
 
   <footer class="peu">
-    <p><a href="https://github.com/montflorit/montflorit.github.io/releases" target="_blank" rel="noopener">versió 1.1.0</a> · <a href="../fonts.html">Fonts i crèdits</a> · <a href="../privacitat.html">Privacitat</a></p>
+    <p><a href="https://github.com/montflorit/montflorit.github.io/releases" target="_blank" rel="noopener">versió 1.2.0</a> · <a href="../fonts.html">Fonts i crèdits</a> · <a href="../privacitat.html">Privacitat</a></p>
     <p>© 2026 <a href="https://bilateria.org" target="_blank" rel="noopener">Juan José de Haro</a> · Continguts <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ca" target="_blank" rel="noopener">CC BY-SA 4.0</a> · Codi <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3</a> · Web veïnal, no oficial</p>
     <p>Fet amb IA (Claude Code, octubre de 2026), <a href="https://jjdeharo.github.io/miae/?nivel=4" target="_blank" rel="noopener">nivell 4 del MIAE</a>.</p>
   </footer>

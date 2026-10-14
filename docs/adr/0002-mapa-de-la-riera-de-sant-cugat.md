@@ -125,6 +125,24 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   deja una franja libre para tocarlo.
 - **Vista inicial: Montflorit** (Juanjo envió una captura con el zoom que
   quería): el barrio con un 20 % de margen; el recorrido entero, alejando.
+- **Otros afluentes de la riera** (Juanjo preguntó si la riera tenía otros
+  afluentes como el dels Gorgs y aprobó añadirlos: «sí, hazlo así»). De la red
+  del ICGC descargada para toda la cuenca (lon 2,035-2,200; lat 41,412-41,525):
+  cada curso con nombre que llega a menos de 30 m de la red ya dibujada, nivel
+  a nivel (afluentes de afluentes) hasta que no aparecen más; 42 cursos en seis
+  niveles, desde la unión, aguas arriba por el mismo nombre y luego por los
+  tramos sin nombre de la cabecera. Se descartan los de menos de 300 m. La
+  Bomba y Saladrigues se unen al tramo cubierto, donde el ICGC no coincide con
+  el Ajuntament: van con el trazado de la capa municipal «Rieres i torrents»
+  (que ya llega a su nacimiento), como la riera cubierta. Cada tramo dice en
+  qué curso desemboca. En una capa propia, «Altres afluents de la riera», que
+  se activa en el selector (desactivada al abrir), más fina y de otro azul.
+  Los ramales sin nombre del Gorgs (el mayor, de unos 500 m) no se añaden.
+  El archivo de datos pasa a guardarse compacto (259 KB).
+- **Idioma persistente** (Juanjo: «el idioma de la web debe ser
+  persistente»): como en Temps a Montflorit, el idioma elegido en el selector
+  se guarda en el dispositivo (`montflorit.idioma`) y cada página se abre en
+  ese idioma; sin elegir, cada página en el suyo.
 - **Fechas de la cobertura**: 1978, 1981 y desde 1995, según el nomenclátor
   del Ajuntament de Sant Cugat («Rambla del Celler»).
 - **Fondo por defecto: OpenStreetMap** (Juanjo lo pidió); también el mapa
