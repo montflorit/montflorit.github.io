@@ -19,10 +19,9 @@ const TEXTOS = {
     },
     decades: 'Any de l\'ortofoto',
     actual: 'Actual',
-    volada: (d) => `Ortofoto volada ${d}`,
-    rang: (a, b) => `entre el ${a} i el ${b}`,
-    dia: (a) => `el ${a}`,
-    mes: (a) => `el ${a}`,
+    // La data de la foto és la del lloc del centre del mapa: cada zona es fotografia un dia.
+    data: (d) => `${d}, al centre del mapa`,
+    rang: (a, b) => `del ${a} al ${b}`,
     capes: {
       barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs i afluents', afluents: 'Altres afluents de la riera',
       xarxa: 'Xarxa hidrogràfica (ACA)',
@@ -75,10 +74,8 @@ const TEXTOS = {
     },
     decades: 'Año de la ortofoto',
     actual: 'Actual',
-    volada: (d) => `Ortofoto tomada ${d}`,
-    rang: (a, b, mes) => (mes ? `entre ${a} y ${b}` : `entre el ${a} y el ${b}`),
-    dia: (a) => `el ${a}`,
-    mes: (a) => `en ${a}`,
+    data: (d) => `${d}, en el centro del mapa`,
+    rang: (a, b, mes) => (mes ? `de ${a} a ${b}` : `del ${a} al ${b}`),
     capes: {
       barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs y afluentes', afluents: 'Otros afluentes de la riera',
       xarxa: 'Red hidrográfica (ACA)',
@@ -357,17 +354,18 @@ function textData(props) {
   const fiText = props.data_final || props.data_inicial;
   const nomesMes = props.data_inicial.slice(8, 10) === '01' && fiText.slice(8, 10) === '01';
   const ini = formataData(props.data_inicial, nomesMes), fi = formataData(fiText, nomesMes);
-  if (ini !== fi) return T.volada(T.rang(ini, fi, nomesMes));
-  return T.volada(nomesMes ? T.mes(ini) : T.dia(ini));
+  return T.data(ini !== fi ? T.rang(ini, fi, nomesMes) : ini);
 }
 function posaAtribucio() {
   mapa.attributionControl.removeAttribution(ortoAntiga.options.attribution);
   const [, any] = DECADES[decadaTriada];
-  ortoAntiga.options.attribution = (dates[decadaTriada] ? dates[decadaTriada] + ': ICGC · ' + T.tracat : atribucioAntiga(any))
-    .replace(': ICGC', ': <a href="' + (LLENGUA === 'es'
-      ? 'https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios/WMS-Ortoimagenes/WMS-Ortofoto-Territorial'
-      : 'https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-Ortoimatges/WMS-Ortofoto-Territorial')
-      + '" target="_blank" rel="noopener">ICGC</a>');
+  const enllac = '<a href="' + (LLENGUA === 'es'
+    ? 'https://www.icgc.cat/es/Geoinformacion-y-mapas/Servicios-en-linea-Geoservicios/WMS-Ortoimagenes/WMS-Ortofoto-Territorial'
+    : 'https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-Ortoimatges/WMS-Ortofoto-Territorial')
+    + '" target="_blank" rel="noopener">ICGC</a>';
+  ortoAntiga.options.attribution = dates[decadaTriada]
+    ? `Ortofoto ${enllac}: ${dates[decadaTriada]} · ${T.tracat}`
+    : atribucioAntiga(any);
   if (mapa.hasLayer(ortoAntiga)) mapa.attributionControl.addAttribution(ortoAntiga.options.attribution);
 }
 let peticioDates = 0;

@@ -155,7 +155,8 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   con la actual seleccionada»): un único fondo «Ortofotos (ICGC)», destacado
   en el selector, con la actual (capa WMS `ortofoto_color_vigent`) al final de
   la regleta y elegida al abrirlo.
-  Cada botón muestra al pasar el ratón la fecha de vuelo de su ortofoto, y el
+  Cada botón muestra al pasar el ratón la fecha de su foto en el centro del
+  mapa (cada zona se fotografió un día; Juanjo pidió decirlo y quitar «volada»), y el
   pie del mapa la de la elegida (Juanjo: «en la actual habría que poner su
   fecha como mensaje emergente»). El ICGC la da por punto con GetFeatureInfo
   (`data_inicial`, `data_final`; cada hoja se vuela un día; permite CORS): se
