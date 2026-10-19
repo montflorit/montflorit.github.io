@@ -62,6 +62,11 @@ const TEXTOS = {
       icgc: 'Obre al visor de l\'ICGC',
       punt: 'Punt compartit',
     },
+    // El botó de compartir el mapa tal com es veu (Juanjo, 19-10-2026).
+    comparteixMapa: 'Comparteix el mapa tal com es veu',
+    restableix: 'Torna el mapa a com era en obrir-lo',
+    textMapa: 'Mapa de la riera de Sant Cugat',
+    ambOrto: (any) => (any ? `, amb l'ortofoto de ${any}` : ', amb l\'ortofoto actual'),
     errada: 'No s\'ha pogut carregar el traçat. Torna-ho a provar més tard.',
   },
   es: {
@@ -116,6 +121,10 @@ const TEXTOS = {
       icgc: 'Abrir en el visor del ICGC',
       punt: 'Punto compartido',
     },
+    comparteixMapa: 'Compartir el mapa tal como se ve',
+    restableix: 'Devolver el mapa a como estaba al abrirlo',
+    textMapa: 'Mapa de la riera de Sant Cugat',
+    ambOrto: (any) => (any ? `, con la ortofoto de ${any}` : ', con la ortofoto actual'),
     errada: 'No se ha podido cargar el trazado. Vuelve a probarlo más tarde.',
   },
 };
@@ -145,15 +154,16 @@ const tesseles = (url, atribucio) => L.tileLayer(url, {
 // Les ortofotos, l'actual i una per dècada (Juanjo, 14-10-2026): un sol fons i, a sota,
 // una regleta per passar d'una a l'altra, amb l'actual triada en obrir-lo. L'ICGC no en té cap dels anys seixanta;
 // dels noranta, la de 1994-1997, que té més detall que les de 1990 i 1993.
+// La tercera columna és el nom de cada una a l'enllaç del mapa (any=).
 const DECADES = [
-  ['ortofoto_blanc_i_negre_1945-1946', '1946'],
-  ['ortofoto_blanc_i_negre_1956-1957', '1956'],
-  ['ortofoto_blanc_i_negre_1970-1977', '1970-77'],
-  ['ortofoto_blanc_i_negre_1983-1989', '1983-89'],
-  ['ortofoto_blanc_i_negre_1994-1997', '1994-97'],
-  ['ortofoto_color_2000-2003', '2000-03'],
-  ['ortofoto_color_2010', '2010'],
-  ['ortofoto_color_vigent', T.actual],
+  ['ortofoto_blanc_i_negre_1945-1946', '1946', '1946'],
+  ['ortofoto_blanc_i_negre_1956-1957', '1956', '1956'],
+  ['ortofoto_blanc_i_negre_1970-1977', '1970-77', '1970-77'],
+  ['ortofoto_blanc_i_negre_1983-1989', '1983-89', '1983-89'],
+  ['ortofoto_blanc_i_negre_1994-1997', '1994-97', '1994-97'],
+  ['ortofoto_color_2000-2003', '2000-03', '2000-03'],
+  ['ortofoto_color_2010', '2010', '2010'],
+  ['ortofoto_color_vigent', T.actual, 'actual'],
 ];
 const ACTUAL = DECADES.length - 1;
 const atribucioAntiga = (any) => T.ortoAny(any) + ' · ' + T.tracat;
@@ -161,12 +171,14 @@ const ortoAntiga = L.tileLayer.wms('https://geoserveis.icgc.cat/servei/catalunya
   layers: DECADES[ACTUAL][0], format: 'image/jpeg', maxZoom: 21, attribution: atribucioAntiga(DECADES[ACTUAL][1]),
 });
 const fonsOsm = tesseles('https://tile.openstreetmap.org/{z}/{x}/{y}.png', T.osm).addTo(mapa);
-const fons = {
-  [T.fons.osm]: fonsOsm,
-  [T.fons.carrers]: tesseles('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/estandard/MON3857NW/{z}/{x}/{y}.png', T.icgc),
-  [T.fons.topo]: tesseles('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/topografic/MON3857NW/{z}/{x}/{y}.png', T.icgc),
-  [T.fons.orto]: ortoAntiga,
+// Cada fons pel seu nom a l'enllaç del mapa (fons=).
+const FONS = {
+  osm: fonsOsm,
+  carrers: tesseles('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/estandard/MON3857NW/{z}/{x}/{y}.png', T.icgc),
+  topo: tesseles('https://geoserveis.icgc.cat/servei/catalunya/mapa-base/wmts/topografic/MON3857NW/{z}/{x}/{y}.png', T.icgc),
+  orto: ortoAntiga,
 };
+const fons = Object.fromEntries(Object.entries(FONS).map(([nom, capa]) => [T.fons[nom], capa]));
 
 // Les capes de l'Agència Catalana de l'Aigua, del seu servei oficial de visualització.
 // Les zones inundables són les de la conca del Besòs, amb la profunditat de l'aigua
@@ -238,12 +250,26 @@ const capaBarri = L.geoJSON(null, {
 
 // Els tres punts de referència.
 const puntsDeReferencia = L.layerGroup();
-function punt(lat, lon, text, opcions) {
+// El naixement de cada afluent va a la capa del seu torrent: surt i s'amaga amb ella.
+function punt(lat, lon, text, opcions, grup = puntsDeReferencia) {
   const marca = L.circleMarker([lat, lon], Object.assign({ radius: 7, color: '#fff', weight: 2, fillOpacity: 1 }, opcions));
   informacio(marca, text, { direction: 'top' });
-  return marca.addTo(puntsDeReferencia);
+  return marca.addTo(grup);
 }
 
+// Les capes que es poden treure i posar, pel seu nom a l'enllaç del mapa (capes=),
+// i les que surten en obrir-lo.
+const CAPES = {
+  barri: capaBarri,
+  gorgs: capaGorgs,
+  afluents: capaAfluents,
+  xarxa: xarxaAca,
+  inundable10: inundables[10],
+  inundable100: inundables[100],
+  inundable500: inundables[500],
+};
+// El torrent dels Gorgs, només si es tria (Juanjo, 19-10-2026: «por defecto no se mostrará»).
+const CAPES_INICIALS = ['barri'];
 const selectorCapes = L.control.layers(fons, {
   [T.capes.barri]: capaBarri,
   [T.capes.gorgs]: capaGorgs,
@@ -474,6 +500,64 @@ const ControlDibuixos = L.Control.extend({
 });
 new ControlDibuixos().addTo(mapa);
 actualitzaBotoDibuixos();
+
+// --- Compartir el mapa tal com es veu (Juanjo, 19-10-2026) ---
+// L'enllaç porta la vista, el fons, l'any de l'ortofoto, les capes, si el dibuix
+// està amagat i el punt marcat, si n'hi ha (vegeu estatDelMapa i ADR 0004).
+const ICONA_COMPARTIR = '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>'
+  + '<line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>';
+let avisCompartir;
+
+function textDelMapa() {
+  if (!mapa.hasLayer(ortoAntiga)) return T.textMapa;
+  return T.textMapa + T.ambOrto(decadaTriada === ACTUAL ? null : DECADES[decadaTriada][1]);
+}
+
+const ControlCompartir = L.Control.extend({
+  options: { position: 'topleft' },
+  onAdd() {
+    const caixa = L.DomUtil.create('div', 'leaflet-bar');
+    const boto = L.DomUtil.create('button', 'boto-completa', caixa);
+    boto.type = 'button';
+    boto.title = T.comparteixMapa;
+    boto.setAttribute('aria-label', T.comparteixMapa);
+    boto.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONA_COMPARTIR}</svg>`;
+    avisCompartir = L.DomUtil.create('span', 'avis-boto', caixa);
+    avisCompartir.setAttribute('role', 'status');
+    L.DomEvent.disableClickPropagation(caixa);
+    L.DomEvent.on(boto, 'click', () => comparteix(textDelMapa(), enllacDelMapa(), () => {
+      avisCompartir.textContent = T.menu.enllacCopiat;
+      setTimeout(() => { avisCompartir.textContent = ''; }, 1800);
+    }));
+    return caixa;
+  },
+});
+new ControlCompartir().addTo(mapa);
+
+// --- Tornar-ho tot a com era en obrir el mapa (Juanjo, 19-10-2026) ---
+// La vista, el fons, l'ortofoto actual, les capes de sempre i el dibuix a la vista;
+// es treu el punt marcat i l'enllaç de la barra d'adreces, perquè en tornar a carregar no torni.
+const ICONA_RESTABLEIX = '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>';
+const ControlRestableix = L.Control.extend({
+  options: { position: 'topleft' },
+  onAdd() {
+    const caixa = L.DomUtil.create('div', 'leaflet-bar');
+    const boto = L.DomUtil.create('button', 'boto-completa', caixa);
+    boto.type = 'button';
+    boto.title = T.restableix;
+    boto.setAttribute('aria-label', T.restableix);
+    boto.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONA_RESTABLEIX}</svg>`;
+    L.DomEvent.disableClickPropagation(caixa);
+    L.DomEvent.on(boto, 'click', () => {
+      if (!limitsBarri) return;
+      history.replaceState(null, '', location.pathname + location.search);
+      mapa.closePopup();
+      aplicaEnllac();
+    });
+    return caixa;
+  },
+});
+new ControlRestableix().addTo(mapa);
 actualitzaBoto();
 document.addEventListener('fullscreenchange', actualitzaBoto);
 document.addEventListener('keydown', (e) => {
@@ -485,7 +569,8 @@ document.addEventListener('keydown', (e) => {
 
 // Els colors es tornen a posar si canvia el tema (tema.js avisa amb «canvi-tema»).
 function repintaColors() {
-  [capaRiera, capaGorgs, capaAfluents].forEach((c) => c.eachLayer((capa) => capa.setStyle(estilTram(capa.feature.properties))));
+  [capaRiera, capaGorgs, capaAfluents].forEach((c) => c.eachLayer((capa) => capa.setStyle(capa.feature
+    ? estilTram(capa.feature.properties) : { fillColor: color(capa.options.variableColor) })));
   capaBarri.setStyle({ color: color('--barri'), fillColor: color('--barri') });
   puntsDeReferencia.eachLayer((capa) => capa.setStyle({ fillColor: color(capa.options.variableColor) }));
 }
@@ -523,8 +608,42 @@ function coordenades(latlng) {
   return `${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}`;
 }
 
+// L'estat del mapa, per a l'enllaç: #mapa=zoom/lat/lon&fons=orto&any=1956&capes=barri,gorgs&dibuixos=0&punt=lat,lon.
+// Les capes amagades amb el botó de l'ull compten com a triades: tornen en mostrar el dibuix.
+function estatDelMapa(ambVista) {
+  const parts = [];
+  if (ambVista) {
+    const c = mapa.getCenter();
+    parts.push(`mapa=${Number(mapa.getZoom().toFixed(1))}/${c.lat.toFixed(5)}/${c.lng.toFixed(5)}`);
+  }
+  const nomFons = Object.keys(FONS).find((nom) => mapa.hasLayer(FONS[nom])) || 'osm';
+  parts.push(`fons=${nomFons}`);
+  if (nomFons === 'orto') parts.push(`any=${DECADES[decadaTriada][2]}`);
+  const triada = (capa) => mapa.hasLayer(capa) || (dibuixosAmagats !== null && dibuixosAmagats.includes(capa));
+  parts.push('capes=' + Object.keys(CAPES).filter((nom) => triada(CAPES[nom])).join(','));
+  if (dibuixosAmagats !== null) parts.push('dibuixos=0');
+  return parts;
+}
+
+function enllacDelMapa() {
+  const parts = estatDelMapa(true);
+  if (marcaCompartida) {
+    const ll = marcaCompartida.getLatLng();
+    parts.push(`punt=${ll.lat.toFixed(5)},${ll.lng.toFixed(5)}`);
+  }
+  return location.origin + location.pathname + '#' + parts.join('&');
+}
+
+// L'enllaç d'un punt porta també el fons i les capes que es veuen; el mapa s'hi obre centrat.
 function enllacPunt(latlng) {
-  return location.origin + location.pathname + `#punt=${latlng.lat.toFixed(5)},${latlng.lng.toFixed(5)}`;
+  const parts = estatDelMapa(false).concat(`punt=${latlng.lat.toFixed(5)},${latlng.lng.toFixed(5)}`);
+  return location.origin + location.pathname + '#' + parts.join('&');
+}
+
+// El menú de compartir del dispositiu, amb el missatge sencer; on no n'hi ha, el missatge es copia sol.
+function comparteix(text, url, copiat) {
+  if (navigator.share) navigator.share({ title: document.title, text, url }).catch(() => {});
+  else copia(`${text}\n${url}`).then(copiat);
 }
 
 function avisaBreu(boto, text) {
@@ -533,8 +652,13 @@ function avisaBreu(boto, text) {
   setTimeout(() => { boto.textContent = original; }, 1800);
 }
 
+// Si el navegador no deixa escriure al porta-retalls (permís denegat), es copia a l'antiga.
 function copia(text) {
-  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).catch(() => copiaAntiga(text));
+  return copiaAntiga(text);
+}
+
+function copiaAntiga(text) {
   const camp = document.createElement('textarea');
   camp.value = text;
   document.body.append(camp);
@@ -568,12 +692,7 @@ function obreMenu(latlng) {
     a.textContent = text;
   };
   boto(T.menu.copia, (b) => copia(coordenades(latlng)).then(() => avisaBreu(b, T.menu.copiat)));
-  boto(T.menu.comparteix, (b) => {
-    const url = enllacPunt(latlng);
-    // El menú de compartir del dispositiu; on no n'hi ha, l'enllaç es copia sol.
-    if (navigator.share) navigator.share({ title: document.title, text: T.menu.textComparteix, url }).catch(() => {});
-    else copia(url).then(() => avisaBreu(b, T.menu.enllacCopiat));
-  });
+  boto(T.menu.comparteix, (b) => comparteix(T.menu.textComparteix, enllacPunt(latlng), () => avisaBreu(b, T.menu.enllacCopiat)));
   const lat = latlng.lat.toFixed(5);
   const lon = latlng.lng.toFixed(5);
   enllac(T.menu.google, `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`);
@@ -591,12 +710,44 @@ contenidor.addEventListener('keydown', (e) => {
   }
 });
 
-// Un enllaç compartit (#punt=lat,lon) obre el mapa centrat en el punt, marcat.
-function puntDeLEnllac() {
-  const m = /#punt=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/.exec(location.hash);
-  if (!m) return null;
-  const ll = L.latLng(+m[1], +m[2]);
-  return Math.abs(ll.lat) <= 90 && Math.abs(ll.lng) <= 180 ? ll : null;
+// --- Obrir el mapa com diu l'enllaç (vegeu estatDelMapa) ---
+// Cada paràmetre és opcional: el que falta queda com en obrir el mapa sense res.
+// Els enllaços d'abans, només amb #punt=lat,lon, segueixen funcionant.
+let limitsBarri;
+
+function coordenadaValida(lat, lon) {
+  return Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+}
+
+function aplicaEnllac() {
+  const p = new URLSearchParams(location.hash.slice(1));
+  const mp = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(p.get('punt') || '');
+  const punt = mp && coordenadaValida(+mp[1], +mp[2]) ? L.latLng(+mp[1], +mp[2]) : null;
+  const mv = /^(\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/.exec(p.get('mapa') || '');
+  // La vista; si no n'hi ha, el punt; si tampoc, Montflorit amb la riera i la vall del torrent
+  // dels Gorgs al voltant (Juanjo, 14-10-2026); el recorregut sencer, allunyant el zoom.
+  if (mv && coordenadaValida(+mv[2], +mv[3])) mapa.setView([+mv[2], +mv[3]], Math.min(21, +mv[1]));
+  else if (punt) mapa.setView(punt, 17);
+  else mapa.fitBounds(limitsBarri.pad(0.2));
+  // El fons; un any d'ortofoto sense fons ja vol dir l'ortofoto.
+  const decada = DECADES.findIndex((d) => d[2] === p.get('any'));
+  const fonsTriat = FONS[p.get('fons')] || (decada >= 0 ? ortoAntiga : fonsOsm);
+  Object.values(FONS).forEach((capa) => { if (capa !== fonsTriat) mapa.removeLayer(capa); });
+  fonsTriat.addTo(mapa);
+  triaDecada(decada >= 0 ? decada : ACTUAL);
+  // Les capes, amb el dibuix a la vista mentre es trien.
+  if (dibuixosAmagats !== null) canviaDibuixos();
+  const triades = p.has('capes') ? p.get('capes').split(',') : CAPES_INICIALS;
+  Object.entries(CAPES).forEach(([nom, capa]) => {
+    if (triades.includes(nom)) capa.addTo(mapa); else mapa.removeLayer(capa);
+  });
+  if (marcaCompartida) mapa.removeLayer(marcaCompartida);
+  marcaCompartida = null;
+  if (punt) {
+    marcaCompartida = L.marker(punt, { title: T.menu.punt, alt: T.menu.punt }).addTo(mapa)
+      .bindTooltip(`${T.menu.punt}: ${coordenades(punt)}`, { permanent: true, direction: 'top', offset: [0, -30] });
+  }
+  if (p.get('dibuixos') === '0') canviaDibuixos();
 }
 
 // --- Les dades ---
@@ -604,21 +755,12 @@ Promise.all([
   fetch(ARREL + 'dades/riera-sant-cugat.geojson').then((r) => r.json()),
   fetch(ARREL + 'dades/montflorit-limits.geojson').then((r) => r.json()),
 ]).then(([riera, barri]) => {
-  // Primer s'enquadra la vista (o el punt d'un enllaç compartit), i després s'hi posen les capes.
-  const compartit = puntDeLEnllac();
-  if (compartit) mapa.setView(compartit, 17);
-  // En obrir la pàgina, Montflorit amb la riera i el torrent dels Gorgs al voltant
-  // (Juanjo, 14-10-2026); el recorregut sencer, allunyant el zoom.
-  else mapa.fitBounds(L.geoJSON(barri).getBounds().pad(0.2));
-  capaBarri.addData(barri).addTo(mapa);
+  limitsBarri = L.geoJSON(barri).getBounds();
+  capaBarri.addData(barri);
   capaRiera.addData(riera).addTo(mapa);
-  capaGorgs.addData(riera).addTo(mapa);
+  capaGorgs.addData(riera);
   capaAfluents.addData(riera);
   tracatRiera = capaRiera.getLayers();
-  if (compartit) {
-    marcaCompartida = L.marker(compartit, { title: T.menu.punt, alt: T.menu.punt }).addTo(mapa)
-      .bindTooltip(`${T.menu.punt}: ${coordenades(compartit)}`, { permanent: true, direction: 'top', offset: [0, -30] });
-  }
   const trams = riera.features;
   const principals = trams.filter((f) => !f.properties.part.startsWith('afluent'));
   const darrer = principals[principals.length - 1].geometry.coordinates;
@@ -631,11 +773,14 @@ Promise.all([
     const primer = trams.find((f) => f.properties.part === 'afluent' && f.properties.nom === nom);
     if (!primer) return;
     const naix = primer.geometry.coordinates[0];
-    punt(naix[1], naix[0], text, { radius: 6, variableColor: '--afluent', fillColor: color('--afluent') });
+    punt(naix[1], naix[0], text, { radius: 6, variableColor: '--afluent', fillColor: color('--afluent') }, capaGorgs);
   });
   punt(41.469438, 2.083075, T.pollancre, { radius: 5, variableColor: '--riera', fillColor: color('--riera') });
   punt(fi[1], fi[0], T.desembocadura, { variableColor: '--riera', fillColor: color('--riera') });
   puntsDeReferencia.addTo(mapa);
+  // La vista, el fons i les capes, els de l'enllaç; i si es canvia l'enllaç sense tornar a carregar la pàgina, també.
+  aplicaEnllac();
+  window.addEventListener('hashchange', aplicaEnllac);
 }).catch(() => {
   const avis = document.createElement('p');
   avis.className = 'destacada';

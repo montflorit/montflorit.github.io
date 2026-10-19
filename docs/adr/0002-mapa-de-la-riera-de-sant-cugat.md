@@ -182,7 +182,8 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   enlace al punto (menú de compartir del dispositivo; si no hay, se copia) y
   abrirlo en Google Maps, OpenStreetMap o el visor del ICGC. Con el teclado,
   la tecla de menú o Mayús+F10 lo abren en el centro del mapa. Un enlace
-  `riera/#punt=lat,lon` abre el mapa centrado en el punto, marcado. Son enlaces
+  `riera/#punt=lat,lon` abre el mapa centrado en el punto, marcado (desde el
+  19-10-2026 el enlace lleva también el fondo y las capas: ADR 0004). Son enlaces
   que sigue quien quiere: el mapa no pide nada a esos servicios.
 - **Capas de la ACA** (Juanjo: «¿se puede añadir la capa del ACA?»): del
   servicio de visualización oficial que la ACA anuncia en «Cartografia i
