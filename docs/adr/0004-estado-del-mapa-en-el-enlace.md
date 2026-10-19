@@ -19,13 +19,15 @@ ahora solo había `#punt=lat,lon`, del menú de un punto (ADR 0002).
   - `fons=osm|carrers|topo|orto`: el fondo.
   - `any=1946|1956|1970-77|1983-89|1994-97|2000-03|2010|actual`: la ortofoto de
     la regleta; sin `fons`, ya implica la ortofoto.
-  - `capes=barri,gorgs,afluents,xarxa,inundable10,inundable100,inundable500`:
+  - `capes=barri,afluents,xarxa,inundable10,inundable100,inundable500`:
     las capas activas, exactamente esas; `capes=` vacío, ninguna. Sin el
     parámetro, las de siempre: solo los límites del barrio (desde la 1.4.0, el
     torrent dels Gorgs ya no sale al abrir el mapa; Juanjo: «por defecto no se
     mostrará el torrent dels gorgs y sus afluentes»). La riera y los
     puntos de referencia no son opcionales; los nacimientos del torrent dels
-    Gorgs y del de Can Domènec van con su capa.
+    Gorgs y del de Can Domènec van con su capa. Desde la 1.5.0 el torrent dels
+    Gorgs va dentro de `afluents` (ADR 0002); `gorgs`, de los enlaces de la
+    1.4.0, se lee como `afluents`.
   - `dibuixos=0`: el dibujo oculto con el botón del ojo.
   - `punt=lat,lon`: el punto marcado.
 - **Cada parámetro es opcional**: lo que falta queda como al abrir el mapa sin

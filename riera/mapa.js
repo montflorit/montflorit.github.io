@@ -23,7 +23,7 @@ const TEXTOS = {
     data: (d) => `${d}, al centre del mapa`,
     rang: (a, b) => `del ${a} al ${b}`,
     capes: {
-      barri: 'Límits de Montflorit', gorgs: 'Torrent dels Gorgs i afluents', afluents: 'Altres afluents de la riera',
+      barri: 'Límits de Montflorit', afluents: 'Afluents de la riera',
       xarxa: 'Xarxa hidrogràfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} anys (ACA)`,
     },
@@ -82,7 +82,7 @@ const TEXTOS = {
     data: (d) => `${d}, en el centro del mapa`,
     rang: (a, b, mes) => (mes ? `de ${a} a ${b}` : `del ${a} al ${b}`),
     capes: {
-      barri: 'Límites de Montflorit', gorgs: 'Torrent dels Gorgs y afluentes', afluents: 'Otros afluentes de la riera',
+      barri: 'Límites de Montflorit', afluents: 'Afluentes de la riera',
       xarxa: 'Red hidrográfica (ACA)',
       inundable: (anys) => `Zona inundable cada ${anys} años (ACA)`,
     },
@@ -191,12 +191,13 @@ const inundables = { 10: capaAca('AIGUA_CALAT_BESOS_Y10'), 100: capaAca('AIGUA_C
 
 // --- Estil de cada tram ---
 function estilTram(p) {
-  if (p.part === 'afluent-riera') {
+  // Tots els afluents, el torrent dels Gorgs inclòs, amb el mateix estil (Juanjo, 19-10-2026).
+  if (p.part.startsWith('afluent')) {
     return { color: color('--afluent2'), weight: 3, dashArray: p.estat === 'cobert' ? '6 5' : null };
   }
-  const c = color(p.part === 'capcalera' ? '--capcalera' : p.part === 'afluent' ? '--afluent' : '--riera');
-  // Coberta (per sota terra): ratllada. L'afluent, una mica més prim.
-  return { color: c, weight: p.part === 'afluent' ? 4 : 5, dashArray: p.estat === 'cobert' ? '8 6' : null };
+  const c = color(p.part === 'capcalera' ? '--capcalera' : '--riera');
+  // Coberta (per sota terra): ratllada.
+  return { color: c, weight: 5, dashArray: p.estat === 'cobert' ? '8 6' : null };
 }
 
 function textTram(p) {
@@ -231,15 +232,10 @@ const capaRiera = L.geoJSON(null, {
   style: (f) => estilTram(f.properties),
   onEachFeature: (f, capa) => informacio(capa, textTram(f.properties), { sticky: true }),
 });
-// El torrent dels Gorgs, que desemboca a la riera a Montflorit, en una capa a part.
-const capaGorgs = L.geoJSON(null, {
-  filter: (f) => f.properties.part === 'afluent',
-  style: (f) => estilTram(f.properties),
-  onEachFeature: (f, capa) => informacio(capa, textTram(f.properties), { sticky: true }),
-});
-// La resta d'afluents de la riera, amb els seus afluents: una capa que s'activa al selector.
+// Els afluents de la riera, amb els seus afluents: el torrent dels Gorgs (part «afluent»)
+// i la resta (part «afluent-riera»), en una sola capa que s'activa al selector (Juanjo, 19-10-2026).
 const capaAfluents = L.geoJSON(null, {
-  filter: (f) => f.properties.part === 'afluent-riera',
+  filter: (f) => f.properties.part.startsWith('afluent'),
   style: (f) => estilTram(f.properties),
   onEachFeature: (f, capa) => informacio(capa, textTram(f.properties), { sticky: true }),
 });
@@ -250,7 +246,7 @@ const capaBarri = L.geoJSON(null, {
 
 // Els tres punts de referència.
 const puntsDeReferencia = L.layerGroup();
-// El naixement de cada afluent va a la capa del seu torrent: surt i s'amaga amb ella.
+// El naixement de cada afluent va a la capa dels afluents: surt i s'amaga amb ella.
 function punt(lat, lon, text, opcions, grup = puntsDeReferencia) {
   const marca = L.circleMarker([lat, lon], Object.assign({ radius: 7, color: '#fff', weight: 2, fillOpacity: 1 }, opcions));
   informacio(marca, text, { direction: 'top' });
@@ -261,18 +257,16 @@ function punt(lat, lon, text, opcions, grup = puntsDeReferencia) {
 // i les que surten en obrir-lo.
 const CAPES = {
   barri: capaBarri,
-  gorgs: capaGorgs,
   afluents: capaAfluents,
   xarxa: xarxaAca,
   inundable10: inundables[10],
   inundable100: inundables[100],
   inundable500: inundables[500],
 };
-// El torrent dels Gorgs, només si es tria (Juanjo, 19-10-2026: «por defecto no se mostrará»).
+// Els afluents, només si es trien (Juanjo, 19-10-2026: «por defecto no se mostrará el torrent dels gorgs»).
 const CAPES_INICIALS = ['barri'];
 const selectorCapes = L.control.layers(fons, {
   [T.capes.barri]: capaBarri,
-  [T.capes.gorgs]: capaGorgs,
   [T.capes.afluents]: capaAfluents,
   [T.capes.xarxa]: xarxaAca,
   [T.capes.inundable(10)]: inundables[10],
@@ -462,7 +456,7 @@ let botoDibuixos;
 let marcaCompartida = null;
 
 function dibuixos() {
-  return [capaRiera, capaGorgs, capaAfluents, capaBarri, puntsDeReferencia, marcaCompartida].filter(Boolean);
+  return [capaRiera, capaAfluents, capaBarri, puntsDeReferencia, marcaCompartida].filter(Boolean);
 }
 
 function actualitzaBotoDibuixos() {
@@ -569,7 +563,7 @@ document.addEventListener('keydown', (e) => {
 
 // Els colors es tornen a posar si canvia el tema (tema.js avisa amb «canvi-tema»).
 function repintaColors() {
-  [capaRiera, capaGorgs, capaAfluents].forEach((c) => c.eachLayer((capa) => capa.setStyle(capa.feature
+  [capaRiera, capaAfluents].forEach((c) => c.eachLayer((capa) => capa.setStyle(capa.feature
     ? estilTram(capa.feature.properties) : { fillColor: color(capa.options.variableColor) })));
   capaBarri.setStyle({ color: color('--barri'), fillColor: color('--barri') });
   puntsDeReferencia.eachLayer((capa) => capa.setStyle({ fillColor: color(capa.options.variableColor) }));
@@ -608,7 +602,7 @@ function coordenades(latlng) {
   return `${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}`;
 }
 
-// L'estat del mapa, per a l'enllaç: #mapa=zoom/lat/lon&fons=orto&any=1956&capes=barri,gorgs&dibuixos=0&punt=lat,lon.
+// L'estat del mapa, per a l'enllaç: #mapa=zoom/lat/lon&fons=orto&any=1956&capes=barri,afluents&dibuixos=0&punt=lat,lon.
 // Les capes amagades amb el botó de l'ull compten com a triades: tornen en mostrar el dibuix.
 function estatDelMapa(ambVista) {
   const parts = [];
@@ -737,7 +731,8 @@ function aplicaEnllac() {
   triaDecada(decada >= 0 ? decada : ACTUAL);
   // Les capes, amb el dibuix a la vista mentre es trien.
   if (dibuixosAmagats !== null) canviaDibuixos();
-  const triades = p.has('capes') ? p.get('capes').split(',') : CAPES_INICIALS;
+  // «gorgs» és la capa del torrent dels Gorgs de la 1.4.0, ara dins dels afluents.
+  const triades = (p.has('capes') ? p.get('capes').split(',') : CAPES_INICIALS).map((nom) => (nom === 'gorgs' ? 'afluents' : nom));
   Object.entries(CAPES).forEach(([nom, capa]) => {
     if (triades.includes(nom)) capa.addTo(mapa); else mapa.removeLayer(capa);
   });
@@ -758,7 +753,6 @@ Promise.all([
   limitsBarri = L.geoJSON(barri).getBounds();
   capaBarri.addData(barri);
   capaRiera.addData(riera).addTo(mapa);
-  capaGorgs.addData(riera);
   capaAfluents.addData(riera);
   tracatRiera = capaRiera.getLayers();
   const trams = riera.features;
@@ -773,7 +767,7 @@ Promise.all([
     const primer = trams.find((f) => f.properties.part === 'afluent' && f.properties.nom === nom);
     if (!primer) return;
     const naix = primer.geometry.coordinates[0];
-    punt(naix[1], naix[0], text, { radius: 6, variableColor: '--afluent', fillColor: color('--afluent') }, capaGorgs);
+    punt(naix[1], naix[0], text, { radius: 6, variableColor: '--afluent2', fillColor: color('--afluent2') }, capaAfluents);
   });
   punt(41.469438, 2.083075, T.pollancre, { radius: 5, variableColor: '--riera', fillColor: color('--riera') });
   punt(fi[1], fi[0], T.desembocadura, { variableColor: '--riera', fillColor: color('--riera') });

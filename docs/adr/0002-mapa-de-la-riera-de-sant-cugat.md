@@ -90,8 +90,9 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   dels Gorgs (topónimo del ICGC en Cerdanyola); 4,6 km. El nacimiento es el
   extremo de su red más alejado de la desembocadura; se tomó primero el punto
   más al norte (granjas de Veterinaria), unos 255 m más abajo, y Juanjo vio en
-  el mapa que nacía antes. En su propia capa (`part: afluent`), con su
-  color, en la leyenda y en el selector; el botón del ojo también lo oculta, y
+  el mapa que nacía antes. En los datos, `part: afluent`; tuvo capa y color
+  propios hasta la 1.5.0, que lo unió a los demás afluentes (ver «Una sola
+  capa de afluentes»); el botón del ojo también lo oculta, y
   la distancia del menú de un punto sigue midiéndose solo a la riera.
 - **Torrent de Can Domènec** (Juanjo: «marca también el torrent de can
   domenec que nace aquí según icgc», con una captura junto al Camí Antic de
@@ -138,6 +139,14 @@ recorrido, completo también bajo Sant Cugat, donde la riera se cubrió.
   qué curso desemboca. En una capa propia, «Altres afluents de la riera», que
   se activa en el selector (desactivada al abrir), más fina y de otro azul.
   Los ramales sin nombre del Gorgs (el mayor, de unos 500 m) no se añaden.
+- **Una sola capa de afluentes** (19-10-2026; Juanjo: «une el torrent del
+  gorgs y sus afluentes a altres afluents de la riera y ponle un nombre
+  apropiado a la capa»). El torrent dels Gorgs, con sus afluentes y los puntos
+  de nacimiento, pasa a la capa de los otros afluentes, que se llama
+  «Afluents de la riera» («Afluentes de la riera»): ya no son «otros», porque
+  están todos. Mismo estilo para todos (el azul claro y fino de los afluentes)
+  y una sola entrada en la leyenda; sustituye a la capa propia del Gorgs con
+  su color. En los datos sigue con `part: afluent`, que lo distingue.
   El archivo de datos pasa a guardarse compacto (259 KB).
 - **Idioma persistente** (Juanjo: «el idioma de la web debe ser
   persistente»): como en Temps a Montflorit, el idioma elegido en el selector
